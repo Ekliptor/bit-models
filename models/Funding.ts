@@ -62,6 +62,8 @@ export class FundingTrade extends FundingAction {
 }
 
 export class FundingOrder extends FundingAction {
+    public marked: boolean = false; // marked for removal. used in OrderBook class to delete outdated entries
+
     constructor() {
         super()
     }

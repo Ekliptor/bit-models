@@ -485,6 +485,12 @@ export const ExchangeName = new Map([
     ["BitMEX", Exchange.BITMEX]
 ])
 
+//export const TwoKeyExchanges = new Set<string>(["Bitfinex"]);
+
+export const NotificationMethods = new Map([
+    ["Pushover", true]
+])
+
 export enum TradingAccount {
     EXCHANGE = 1,
     MARGIN = 2,

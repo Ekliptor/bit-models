@@ -41,6 +41,8 @@ export function initMany(trades: any[]): TradeHistory[] {
 export function addToHistory(db, history: TradeHistory, cb?) {
     let collection = db.collection(COLLECTION_NAME)
     let pairNr = history.currencyPair.toNr();
+    let insertHistory = Object.assign({}, history);
+    insertHistory.currencyPair = pairNr;
     collection.find({
         exchange: history.exchange,
         currencyPair: pairNr
@@ -50,14 +52,20 @@ export function addToHistory(db, history: TradeHistory, cb?) {
         existingHistory = initMany(existingHistory);
         let deleteIds = []
         existingHistory.forEach((curHistory: TradeHistory) => {
-            if (!utils.date.overlaps(history, curHistory, true))
+            if (!utils.date.overlaps(insertHistory, curHistory, true))
                 return;
             // merge the range by taking the min and max
-            if (history.start.getTime() >= curHistory.start.getTime())
-                history.start = curHistory.start;
-            if (history.end.getTime() <= curHistory.end.getTime())
-                history.end = curHistory.end;
-            deleteIds.push(curHistory._id);
+            let remove = false;
+            if (insertHistory.start.getTime() >= curHistory.start.getTime()) {
+                insertHistory.start = curHistory.start;
+                remove = true;
+            }
+            if (insertHistory.end.getTime() <= curHistory.end.getTime()) {
+                insertHistory.end = curHistory.end;
+                remove = true;
+            }
+            if (remove === true) // should always be true if history overlaps
+                deleteIds.push(curHistory._id);
         })
 
         collection.deleteMany({_id: {$in: deleteIds}}, (err, result) => {
@@ -65,13 +73,12 @@ export function addToHistory(db, history: TradeHistory, cb?) {
                 logger.error("Error deleting overlapping ids", err);
                 return cb && cb(err);
             }
-            let insertHistory = Object.assign({}, history);
-            insertHistory.currencyPair = pairNr;
             collection.insertOne(insertHistory, (err, result) => {
                 if (err) {
                     logger.error("Error inserting trade history", err);
                     return cb && cb(err)
                 }
+                cb && cb()
             })
         })
     })

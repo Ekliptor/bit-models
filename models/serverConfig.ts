@@ -37,6 +37,7 @@ export class ServerConfig extends DatabaseObject {
     public checkMargins = true
     public checkInstances = true
     public instanceCount = 5
+    public monitoringInstanceDir = "_monitor";
     public instanceApiCheckRepeatingSec = 30 // check again after x seconds befor terminating the instance
     public httpTimeoutMs = 130*1000 // > 2min // poloniex msg: This IP has been banned for 2 minutes. Please adjust your timeout to 130 seconds.
     public websocketTimeoutMs = 35000 // after how long we will reset the connection if we don't receive any trades
@@ -102,12 +103,14 @@ export class ServerConfig extends DatabaseObject {
         startBalance: 1.0, // for every coin (leveraged *2.5 when margin trading)
         slippage: 0.0, // in %, for example 0.05%
         cacheCandles: false,
-        walk: true // Walk Forward Analysis: load previously optimized parameters and continue optimizing on them
+        walk: true, // Walk Forward Analysis: load previously optimized parameters and continue optimizing on them
+        resetWarmupBacktestErrorSec: 30
     }
     public batchTrades = true;
     public exchangeImportDelayMs = 5000; // Bitfinex (and others?) need time to connect websockets
     public parentBacktestTickMs = 1000;
     public importTickIntervalMs = 3000;
+    public importWarmupAddPercent = 20; // how many percent more the "max candles" shall be imported
 
     public plot = {
         emaPeriod: 26
@@ -133,6 +136,8 @@ export class ServerConfig extends DatabaseObject {
     public logTimeoutMin = 5 // after what time log entries from logOnce() can appear again
     public uiLogLineCount = 100 // how many recent log lines to fetch when when web UI starts
     public restoreStateMaxAgeMin = 600 // after this time state will be discarded. use higher values if bot crashes more often
+    public restoreStateFromOthers = true; // try to restore strategy states from other strategies with the same candle size
+    public restoreStateFromBacktest = true; // run a backtest to restore the state if we have no local state history
     public gzipState = true
     public searchAllPairsForState = true
 
@@ -259,15 +264,20 @@ export class ServerConfig extends DatabaseObject {
     public username = "Ekliptor";
     public password = "";
     public loggedIn = false;
-    public userToken = "h9Ao3h14-SLlsJdfl324SDUfosUdfl34jljgfl34ewrwer"; // unique random string per user: token-confirm-botNr from user.ts
+    // unique random string per user, idea: token-confirm-botNr from user.ts
+    // currently used sha2(userTokenSeed + appDir + username)
+    public userToken = "h9Ao3h14-SLlsJdfl324SDUfosUdfl34jljgfl34ewrwer";
     public user = {
         // object gets loaded and stored in DB (values here will be overwritten)
-        devMode: false
+        devMode: false,
+        restoreCfg: false
     }
     public checkLoginUrl = ""; // the API url for premium bot login
     public checkLoginApiKey = "";
     public checkLoginIntervalMin = 60;
+    public notifyBeforeSubscriptionExpirationDays = 3;
     public premiumConfigFileName = "sensorConfig.json";
+    public userTokenSeed = "nSDfhwelk5uo3uoDJ45tesgsasnll2p23GGG";
 
     public serverType = { // TODO add a json config file to machines and put server specific config here (number of backtest processes, ...)
         local: {},
@@ -323,6 +333,7 @@ export function loadServerConfig(db, cb) {
 }
 
 export async function saveConfig(db, configObj: ServerConfig): Promise<void> {
+    logger.warn("Saving server config shouldn't be used currently. Better save config locally with nconf to a JSON file.")
     let collection = db.collection(COLLECTION_NAME)
     let filter: any = {}
     if (configObj.premium === true) {
@@ -339,6 +350,16 @@ export async function saveConfig(db, configObj: ServerConfig): Promise<void> {
     catch (err) {
         logger.error("Error updating config", err);
     }
+}
+
+export function saveConfigLocal() {
+    return new Promise<void>((resolve, reject) => {
+        nconf.save(null, (err) => {
+            if (err)
+                logger.error("Error saving config locally", err);
+            resolve(); // always resolve
+        });
+    })
 }
 
 export function getObjFromArr(valuesArr, key, keyName = 'name') {
@@ -391,6 +412,8 @@ export function getInitFunctions(db) {
             let dataDir = nconf.get('debug') ? 'test' : 'production'
             const dirPath = path.join(CUR_DIR, 'data', dataDir, 'serverConfig.json')
             utils.test.readData(dirPath, (testData) => {
+                if (Array.isArray(testData) === false)
+                    return logger.warn("No test data for init found. Using default values")
                 let objects = []
                 testData.forEach((data) => {
                     objects.push(utils.test.createObject(new ServerConfig(), data))

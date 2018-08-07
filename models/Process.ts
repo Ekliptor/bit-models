@@ -28,7 +28,10 @@ export class Process extends DatabaseObject {
     }
 
     public init() {
-        this.uniqueID = crypto.createHash('sha512').update(JSON.stringify({h: this.hostname, a: this.args}), 'utf8').digest('base64')
+        this.uniqueID = crypto.createHash('sha512')
+            //.update(JSON.stringify({h: this.hostname, a: this.args}), 'utf8') // don't use args because they might change
+            .update(JSON.stringify({h: this.hostname, p: utils.appDir}), 'utf8')
+            .digest('base64');
     }
 }
 
