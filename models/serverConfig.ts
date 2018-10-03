@@ -1,11 +1,12 @@
 import * as utils from "@ekliptor/apputils";
-const nconf = utils.nconf
-    , logger = utils.logger
 import {DatabaseObject} from "./base/DatabaseObject";
 import * as fs from "fs";
 import * as path from "path";
 import {SocialNetwork} from "./Social/SocialPost";
-import {Exchange} from "./base/Currency";
+import {Currency, Exchange} from "./base/Currency";
+
+const nconf = utils.nconf
+    , logger = utils.logger
 
 const textDirs = [path.join(__dirname, 'text') + path.sep,
     path.join(__dirname, '..', '..', 'models', 'text') + path.sep] // if we are inside /build dir
@@ -17,7 +18,11 @@ const DEFAULT_EXCHANGE_PROXY = []; // an array of proxy URLs to randomly choose 
 // there is only 1 doc of this in the database
 
 export const COLLECTION_NAME = 'serverConfig'
-export const OVERWRITE_PROPS = ["name", "notificationMethod", "apiKey", "twitterApi", "user", "username", "password", "userToken"];
+// config values that can be changed by the user (and are not overwritten with default values) must be added here
+export const OVERWRITE_PROPS = ["name", "notificationMethod", "apiKey", "twitterApi", "user", "username", "password", "userToken",
+    "pausedTrading", "pausedOpeningPositions"];
+
+let saveConfigTimerID: NodeJS.Timer = null;
 
 export class ServerConfig extends DatabaseObject {
     public name = 'master' // token-botNr from user.ts for premium bot users
@@ -25,6 +30,7 @@ export class ServerConfig extends DatabaseObject {
     public processIntervalBaseSec = 0
     public processIntervalRandomSec = 5
     public notificationMethod = "Pushover" // name of the notification class ("Pushover")
+    public adminNotificationMethod = "Pushover"; // class to notify admin in case of problems
     public candlestickPatternRecognizer = "NodeCandlestick"
     public maxCandlestickCandles = 5
     public trendlineKeepDays = 14
@@ -36,11 +42,12 @@ export class ServerConfig extends DatabaseObject {
     public notificationPauseMin = 180 // how long to wait before sending the same notification again (per strategy)
     public checkMargins = true
     public checkInstances = true
-    public instanceCount = 5
+    public instanceCount = 6
     public monitoringInstanceDir = "_monitor";
     public instanceApiCheckRepeatingSec = 30 // check again after x seconds befor terminating the instance
+    public assumeBotCrashedMin = 11 // after we get no response for this time we assume the bot is not starting (errors on startup)
     public httpTimeoutMs = 130*1000 // > 2min // poloniex msg: This IP has been banned for 2 minutes. Please adjust your timeout to 130 seconds.
-    public websocketTimeoutMs = 35000 // after how long we will reset the connection if we don't receive any trades
+    public websocketTimeoutMs = 35000 // after how long we will reset the connection to the exchange if we don't receive any trades
     public httpPollIntervalSec = 20 // for exchanges without websocket support
     public fetchTradesMinBack = 2
     public keepResponseTimes = {
@@ -72,6 +79,8 @@ export class ServerConfig extends DatabaseObject {
     public maxClosePartialPercentage = 99.1;
     public checkUpdateIntervalH = 25; // don't set this too low because candles smaller than this interval will not get filled otherwise
     public loadConfigIntervalMin = 10; // save CPU
+
+    public websocketPingMs = 30000 // keep alive ping for WebUI
 
     // Lending
     public updateBalancesTimeSec = 120;
@@ -140,6 +149,8 @@ export class ServerConfig extends DatabaseObject {
     public restoreStateFromBacktest = true; // run a backtest to restore the state if we have no local state history
     public gzipState = true
     public searchAllPairsForState = true
+    public pausedTrading = false
+    public pausedOpeningPositions = false
 
     // moved to BrainConfig.pricePoints
     //public inputPricePoints = 10; // 11 // inputs per currency for neuroal network price predictions (for example input 10 and predict the 11th price)
@@ -197,8 +208,12 @@ export class ServerConfig extends DatabaseObject {
         notify: {
             Pushover: {
                 appToken: "",
-                receiver: ""
+                receiver: "",
+                adminReceiver: ""
             }
+        },
+        coinMarketCap: {
+            apiKey: ""
         }
     }
 
@@ -210,7 +225,7 @@ export class ServerConfig extends DatabaseObject {
     public cleanupPostsIntervalDays = 1;
     public networksEnabled = [SocialNetwork.REDDIT, SocialNetwork.TWITTER, SocialNetwork.TELEGRAM];
     public checkSocialSpikeMin = 60;
-    public crawlPricesMin = 30;
+    public crawlPricesMin = 30; // we currently show them hourly
     public crawlPricesHttpTimeoutSec = 50;
     public crawlTickerHours = 12;
     public tickerVolumeSpikeFactor = 2.0;
@@ -223,7 +238,8 @@ export class ServerConfig extends DatabaseObject {
     public crawlTickerExchangeLabels = [Exchange.BITTREX, Exchange.BINANCE, Exchange.BITFINEX, Exchange.POLONIEX];
     public requiredTickerCurrencies = ["BTC", "XBT", "USD"];
     public listTopSocialCurrencies = 20;
-    public crawlPricesUrl = "https://api.coinmarketcap.com/v2/ticker/?start=0&limit=300";
+    public maxLinePlotCurrencies = 8;
+    //public crawlPricesUrl = "https://api.coinmarketcap.com/v2/ticker/?start=0&limit=300"; // deprecated. removed in December 2018
     public minPostsDayBefore = {
         twitter: 1700,
         telegram: 10,
@@ -237,6 +253,9 @@ export class ServerConfig extends DatabaseObject {
     public coinMarketInfoDisplayAgeDays = 7;
     public cleanupPriceDataIntervalDays = 1;
     public priceDataDeleteOldDays = 14;
+    public coinsTickIndicatorHours = 96;  // must be <= coinMarketInfoDisplayAgeDays
+    public priceComparisonCoins = [Currency.BTC, Currency.ETH, Currency.XRP, Currency.BCH, Currency.EOS, Currency.STR, Currency.LTC,
+            Currency.ADA, Currency.XMR, Currency.IOTA, Currency.DASH, Currency.TRX, Currency.TRX, Currency.BNB, Currency.XEM];
 
     public twitterApi = {
         consumerKey: '',
@@ -248,16 +267,43 @@ export class ServerConfig extends DatabaseObject {
     public twitterStatusBaseUrl = "https://twitter.com/statuses/"
     public pollTwitterDataSec = 2; // max 450 requests per 15 min
     public maxTwitterQueryLength = 500; // their docs say 500 - only for REST API (no comma separated queries)
+    public minCurrencyNameLengthSocial = 4;
+    public twitterCurrencyTagFilter = ["amp", "bts", "omg", "pay", "game", "fun", "part", "dat", "gas", "via", "str", "nxt",
+        "smart", "pink", "note", "eng", "act", "storm", "hot", "ht", "bela",
+        // currencies we might want to move to "required" filter
+        "edo", "pasc", "salt", "sc", "cvc", "drop", "kin"];
+    // also for news
+    public twitterRequireCurrencyKeyword = ["waves", "burst", "bat", "vet", "san", "ada", "mana", "ark", "mona", "naut",
+        "avt", "veri", "link", "amp", "sub", "pay", "block", "game", "fun", "part", "via", "ppt", "theta", "icn",
+        "ela", "maker", "status", "wings"];
 
     public cryptoCurrencyKeywords = [
         // additional crypto keywords. we already search for all currency keywords and symbols. see Currency.ts
         "Blockchain",
         "Crypto Currency",
         "Cryptocurrency",
-        "Mining"
+        "Mining",
+        "Hash",
+        "Hashing",
+        "BTC",
+        "Bitcoin",
+        "ETH",
+        "Ethereum",
+        "Ether",
+        "Crypto",
+        "Litecoin",
+        "Dash",
+        "Monero",
+        "Zcash",
+        "Wallet",
+        "Foundation",
+        "Dev",
+        "Developer",
+        "Developers"
     ]
+    // TODO add crypto hashtags that we also search for on twitter such as #CryptoTwitter
     public maxLengthCurrencyRaw = 8; // Binance = 7
-    public currencyRawFilter = ["BINANCE", "BITTREX", "AIRDROP", "NEWS", "NEW", "STOPLOSS", "ALT", "YOBIT", "WHALES", "HTML"];
+    public currencyRawFilter = ["BINANCE", "BITTREX", "AIRDROP", "NEWS", "NEW", "STOPLOSS", "ALT", "YOBIT", "WHALES", "HTML", "ALTCOINS"];
 
     // User config
     public premium = false // is it a bot being sold (or our own private bot). affects mostly UI + debugging
@@ -273,11 +319,13 @@ export class ServerConfig extends DatabaseObject {
         restoreCfg: false
     }
     public checkLoginUrl = ""; // the API url for premium bot login
+    public updateApiKeyUrl = "";
     public checkLoginApiKey = "";
     public checkLoginIntervalMin = 60;
     public notifyBeforeSubscriptionExpirationDays = 3;
     public premiumConfigFileName = "sensorConfig.json";
     public userTokenSeed = "nSDfhwelk5uo3uoDJ45tesgsasnll2p23GGG";
+    public firstStart: Date = null;
 
     public serverType = { // TODO add a json config file to machines and put server specific config here (number of backtest processes, ...)
         local: {},
@@ -354,11 +402,19 @@ export async function saveConfig(db, configObj: ServerConfig): Promise<void> {
 
 export function saveConfigLocal() {
     return new Promise<void>((resolve, reject) => {
-        nconf.save(null, (err) => {
-            if (err)
-                logger.error("Error saving config locally", err);
-            resolve(); // always resolve
-        });
+        if (saveConfigTimerID !== null) { // delay saving because this might be called multiple times at once
+            clearTimeout(saveConfigTimerID);
+            saveConfigTimerID = null;
+        }
+        saveConfigTimerID = setTimeout(() => {
+            saveConfigTimerID = null;
+            nconf.save(null, (err) => {
+                if (err)
+                    logger.error("Error saving config locally", err);
+                //resolve(); // always resolve
+            });
+        }, 600);
+        setTimeout(resolve.bind(this), 600); // easy way: always resolve after timer
     })
 }
 
@@ -412,8 +468,10 @@ export function getInitFunctions(db) {
             let dataDir = nconf.get('debug') ? 'test' : 'production'
             const dirPath = path.join(CUR_DIR, 'data', dataDir, 'serverConfig.json')
             utils.test.readData(dirPath, (testData) => {
-                if (Array.isArray(testData) === false)
-                    return logger.warn("No test data for init found. Using default values")
+                if (Array.isArray(testData) === false) {
+                    logger.verbose("No test data for init found. Using default values")
+                    return callback && callback()
+                }
                 let objects = []
                 testData.forEach((data) => {
                     objects.push(utils.test.createObject(new ServerConfig(), data))

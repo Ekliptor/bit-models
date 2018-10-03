@@ -14,7 +14,7 @@ export type TradeType =
 export enum TradeType {
     BUY = 1, // for orders: ask
     SELL = 2, // for orders: bid
-    CLOSE = 3, // can be buy or sell (depending on if we are long or short)
+    CLOSE = 3, // can be buy or sell (depending on if we are long or short) // not present for external trades (trade history and live trades)
     PENDING = 4 // for open market orders
 }
 

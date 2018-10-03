@@ -54,7 +54,7 @@ export enum SocialNetwork {
     BTCMANAGER = 126,
     BITCOINIST = 127,
     LIVEBITCOINNEWS = 128,
-    ZCRYPTO = 129,
+    ZCRYPTO = 129, // zycrypto.com
     THE_INDEPENDENT_REPUBLIC = 130,
     PROFITCONFIDENTIAL = 131,
     COINIDOL = 132,
@@ -72,6 +72,20 @@ export enum SocialNetwork {
     INVESTOPEDIA = 144,
     COINGAPE = 145,
     CRYPTOVEST = 146,
+    COINCRISPY = 147,
+    CRYPTOGLOBE = 148,
+    COINJOURNAL = 149,
+    INVESTINBLOCKCHAIN = 150,
+    DAILYHODL = 151,
+    BLOKT = 152,
+    CRYPTODAILY = 153,
+    CRYPTOPOST = 154,
+    COININSIDER = 155,
+    UNHASHED = 156,
+    THEBITCOINNEWS = 157,
+    BITZAMP = 158,
+    SAMCRYPTO = 159,
+    COINSHOT = 160,
 
     MULTIPLE = 10000
 }
@@ -100,8 +114,17 @@ export class SocialPostAggregateMap extends Map<string, SocialPostAggregate[]> {
             let lastDay = currencyAggregage[currencyAggregage.length-1];
             if (lastDay.year === date.getUTCFullYear() && lastDay.month === date.getUTCMonth() && lastDay.day === date.getUTCDate()) {
                 lastDay.sentiment.compSum += sentiment.comparative;
-                if (sentimentHeadline)
+                if (sentiment.comparative > 0.0)
+                    lastDay.sentiment.countPositive++;
+                else
+                    lastDay.sentiment.countNegative++;
+                if (sentimentHeadline) {
                     lastDay.sentimentHeadline.compSum += sentimentHeadline.comparative;
+                    if (sentimentHeadline.comparative > 0.0)
+                        lastDay.sentimentHeadline.countPositive++;
+                    else
+                        lastDay.sentimentHeadline.countNegative++;
+                }
                 if (reply)
                     lastDay.commentCount += incrementCount;
                 else
@@ -227,10 +250,14 @@ export class SocialPostAggregate {
     sentiment: {
         compAvg: number;
         compSum: number;
+        countPositive: number;
+        countNegative: number;
     }
     sentimentHeadline: {
         compAvg: number;
         compSum: number;
+        countPositive: number;
+        countNegative: number;
     }
 
     constructor(date: Date, sentiment: Sentiment = null, reply: boolean = false, sentimentHeadline: Sentiment = null) {
@@ -239,11 +266,15 @@ export class SocialPostAggregate {
         this.day = date.getUTCDate();
         this.sentiment = {
             compAvg: 0,
-            compSum: sentiment ? sentiment.comparative : 0
+            compSum: sentiment ? sentiment.comparative : 0,
+            countPositive: sentiment && sentiment.comparative > 0.0 ? 1 : 0, // TODO add a threshold to count sentiment below x as "neutral" ?
+            countNegative: sentiment && sentiment.comparative < 0.0 ? 1 : 0
         };
         this.sentimentHeadline = {
             compAvg: 0,
-            compSum: sentimentHeadline ? sentimentHeadline.comparative : 0
+            compSum: sentimentHeadline ? sentimentHeadline.comparative : 0,
+            countPositive: sentimentHeadline && sentimentHeadline.comparative > 0.0 ? 1 : 0,
+            countNegative: sentimentHeadline && sentimentHeadline.comparative < 0.0 ? 1 : 0
         };
         if (sentiment) { // otherwise it's an empty day
             if (reply)

@@ -42,6 +42,8 @@ export abstract class AbstractBotTrade extends DatabaseObject {
 
     public userToken: string = ""; // for auth in public environment
 
+    // other data such as currencyPairStr is added in UI when creating UITrade objects
+
     constructor(time: Date, market: LogTradeMarket, type: LogTradeType, exchange: Exchange, currencyPair: CurrencyPair) {
         super()
         this.market = market;

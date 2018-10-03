@@ -6,7 +6,7 @@
     "outDir": "./build",
     "declaration": true,
     "declarationDir": "./build",
-    "allowJs": true,
+    "allowJs": false,
     "sourceMap": true,
     "pretty": true,
     "alwaysStrict": true,

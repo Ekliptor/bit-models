@@ -23,7 +23,7 @@ export class CoinMarketInfoMap extends Map<string, CoinMarketInfo[]> { // (curre
                 continue; // we have no data on this coin yet
             let emptyInfo = new CoinMarketInfo(Currency[coin[0]]);
             let firstDate = utils.date.dateFromUtc(infos[0].year, infos[0].month, infos[0].day, infos[0].hour);
-            while (infos.length < max)
+            while (infos.length < max) // add a copy of the first row ahead of the array until it has the same length
             {
                 emptyInfo = Object.assign(new CoinMarketInfo(emptyInfo.currency), emptyInfo); // copy it
                 firstDate.setTime(firstDate.getTime() - 1*3600000); // go back 1h

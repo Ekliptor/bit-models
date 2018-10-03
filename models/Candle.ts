@@ -21,6 +21,8 @@ export class Candle extends /*AssetAction*/DatabaseObject {
     public close: number = 0;
     public vwp: number = 0; // VWAP, weightedAverage https://en.wikipedia.org/wiki/Volume-weighted_average_price
     public volume: number = 0; // base volume
+    public upVolume: number = 0;
+    public downVolume: number = 0;
     //public quoteVolume: number = 0;
     public trades: number = 0;
 
@@ -52,6 +54,10 @@ export class Candle extends /*AssetAction*/DatabaseObject {
             let pair = new CurrencyPair(candle.currencyPair.from, candle.currencyPair.to)
             let curCopy = Object.assign(new Candle(pair), candle);
             curCopy.currencyPair = pair;
+            if (curCopy.upVolume === undefined) // to be compatible with reading old state files
+                curCopy.upVolume = 0.0;
+            if (curCopy.downVolume === undefined)
+                curCopy.downVolume = 0.0;
             if (!withTrades)
                 delete curCopy.tradeData;
             copy.push(curCopy)

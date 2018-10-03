@@ -8,8 +8,8 @@ export const enum SocialActionType {
     News = 4
 }
 export interface Sentiment {
-    score: number;
-    comparative: number;
+    score: number; // score for all words combined
+    comparative: number; // score divided by number of words
 }
 
 export abstract class SocialAction extends DatabaseObject {
