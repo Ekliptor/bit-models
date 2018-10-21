@@ -20,7 +20,7 @@ const DEFAULT_EXCHANGE_PROXY = []; // an array of proxy URLs to randomly choose 
 export const COLLECTION_NAME = 'serverConfig'
 // config values that can be changed by the user (and are not overwritten with default values) must be added here
 export const OVERWRITE_PROPS = ["name", "notificationMethod", "apiKey", "twitterApi", "user", "username", "password", "userToken",
-    "pausedTrading", "pausedOpeningPositions"];
+    "pausedTrading", "pausedOpeningPositions", "lastWorkingConfigName"];
 
 let saveConfigTimerID: NodeJS.Timer = null;
 
@@ -151,6 +151,10 @@ export class ServerConfig extends DatabaseObject {
     public searchAllPairsForState = true
     public pausedTrading = false
     public pausedOpeningPositions = false
+    public lastWorkingConfigName = "Noop";
+    public fallbackTradingConfig = "Noop";
+    public lastRestartTime: Date = null;
+    public restartPreviouslyIntervalMin = 10; // how many minutes we shall count the restart as recent, before resetting all config on failure otherwise
 
     // moved to BrainConfig.pricePoints
     //public inputPricePoints = 10; // 11 // inputs per currency for neuroal network price predictions (for example input 10 and predict the 11th price)
@@ -271,7 +275,7 @@ export class ServerConfig extends DatabaseObject {
     public twitterCurrencyTagFilter = ["amp", "bts", "omg", "pay", "game", "fun", "part", "dat", "gas", "via", "str", "nxt",
         "smart", "pink", "note", "eng", "act", "storm", "hot", "ht", "bela",
         // currencies we might want to move to "required" filter
-        "edo", "pasc", "salt", "sc", "cvc", "drop", "kin"];
+        "edo", "pasc", "salt", "sc", "cvc", "drop", "kin", "pot", "sky", "wtc", "rep"];
     // also for news
     public twitterRequireCurrencyKeyword = ["waves", "burst", "bat", "vet", "san", "ada", "mana", "ark", "mona", "naut",
         "avt", "veri", "link", "amp", "sub", "pay", "block", "game", "fun", "part", "via", "ppt", "theta", "icn",
