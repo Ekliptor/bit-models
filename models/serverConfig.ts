@@ -250,6 +250,7 @@ export class ServerConfig extends DatabaseObject {
         other: 100
     };
     public postTodayIncreaseFactor = 1.7;
+    public startExtrapolateMessageH = 9; // don't send spike notifications before 9 AM (extrapolated for the whole day) to avoid false positives
     public spikeNotificationRepeatHours = 24; // how many hours before a message for the same network + currency can be sent again
     public rssFeedPollIntervalMin = 30;
     public checkTelegramRunningMin = 120;
@@ -260,6 +261,7 @@ export class ServerConfig extends DatabaseObject {
     public coinsTickIndicatorHours = 96;  // must be <= coinMarketInfoDisplayAgeDays
     public priceComparisonCoins = [Currency.BTC, Currency.ETH, Currency.XRP, Currency.BCH, Currency.EOS, Currency.STR, Currency.LTC,
             Currency.ADA, Currency.XMR, Currency.IOTA, Currency.DASH, Currency.TRX, Currency.TRX, Currency.BNB, Currency.XEM];
+    public notifyCoinMarketApiErrors = true;
 
     public twitterApi = {
         consumerKey: '',
@@ -420,6 +422,7 @@ export function saveConfigLocal() {
         }, 600);
         setTimeout(resolve.bind(this), 600); // easy way: always resolve after timer
     })
+    // TODO add 2nd backup file and load from backup if 1st fails (invalid JSOn when crashing while saving)
 }
 
 export function getObjFromArr(valuesArr, key, keyName = 'name') {

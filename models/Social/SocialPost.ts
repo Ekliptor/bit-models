@@ -86,6 +86,7 @@ export enum SocialNetwork {
     BITZAMP = 158,
     SAMCRYPTO = 159,
     COINSHOT = 160,
+    MODERNCONSENSUS = 161,
 
     MULTIPLE = 10000
 }

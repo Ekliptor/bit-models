@@ -90,7 +90,7 @@ export enum Currency {
     MONA = 162,
     WAVES = 163,
     PPT = 164,
-    HSR = 165,
+    //HSR = 165, // removed (from CMC, and everywhere?)
     SALT = 166,
     KMD = 167,
     TRX = 168,
@@ -212,6 +212,7 @@ export enum Currency {
     ODE = 294,
     POLY = 295,
     CTXC = 296,
+    BSV = 297, // Bitcoin SV
 
 
     USDT = 200, // US Dollar tethered, rates almost identical to US dollar
@@ -301,7 +302,7 @@ export const CurrencyName = new Map([
     [Currency.XPM, ["Primecoin"]],
     [Currency.XVC, ["Vcash"]],
     [Currency.USDT, ["US Dollar Tethered"]],
-    [Currency.BCH, ["BitCoin Cash", "BCH", "BCC"]], // BitConnect is dead, Bittrex calls it BCC
+    [Currency.BCH, ["Bitcoin Cash", "BitcoinCash", "BCC", "BCash"]], // BitConnect is dead, Bittrex calls it BCC
     [Currency.EOS, ["EOS"]],
     [Currency.IOTA, ["IOTA", "MIOTA"]],
     [Currency.OMG, ["OMG", "OmiseGO"]],
@@ -319,7 +320,7 @@ export const CurrencyName = new Map([
     [Currency.MONA, ["MONA", "MonaCoin", "Mona Coin", "Mona"]],
     [Currency.WAVES, ["WAVES"]],
     [Currency.PPT, ["PPT", "Populous"]],
-    [Currency.HSR, ["HSR", "Hshare"]], // TODO reddit
+    //[Currency.HSR, ["HSR", "Hshare"]], // reddit missing
     [Currency.SALT, ["SALT"]],
     [Currency.KMD, ["KMD", "Komodo"]],
     [Currency.TRX, ["TRX", "TRON"]],
@@ -441,6 +442,7 @@ export const CurrencyName = new Map([
     [Currency.ODE, ["ODEM"]],
     [Currency.POLY, ["Polymath"]],
     [Currency.CTXC, ["Cortex"]],
+    [Currency.BSV, ["Bitcoin SV", "Bitcoin Cash SV"]],
 
     [Currency.USD, ["US Dollar"]],
     [Currency.EUR, ["Euro"]]
