@@ -20,9 +20,10 @@ const DEFAULT_EXCHANGE_PROXY = []; // an array of proxy URLs to randomly choose 
 export const COLLECTION_NAME = 'serverConfig'
 // config values that can be changed by the user (and are not overwritten with default values) must be added here
 export const OVERWRITE_PROPS = ["name", "notificationMethod", "apiKey", "twitterApi", "user", "username", "password", "userToken",
-    "pausedTrading", "pausedOpeningPositions", "lastWorkingConfigName"];
+    "pausedTrading", "pausedOpeningPositions", "lastWorkingConfigName", "firstStart"];
 
 let saveConfigTimerID: NodeJS.Timer = null;
+let saveConfigQueue = Promise.resolve();
 
 export class ServerConfig extends DatabaseObject {
     public name = 'master' // token-botNr from user.ts for premium bot users
@@ -55,8 +56,8 @@ export class ServerConfig extends DatabaseObject {
         avg: 25,
         lowFactor: 4.2 // how many times the recent ping has to be higher than avg for the exchange to be considered overloaded
     }
-    public forwardTradesSec = 9; // limit how often we forward trades to strategies to save CPU
-    public forwardTradesAddPerMarketSec = 1.4;
+    public forwardTradesSec = 1; // limit how often we forward trades to strategies to save CPU
+    public forwardTradesAddPerMarketSec = 1.3;
     public optimizeNumberDecimals = 10; // 10 = 1 decimal, 100 = 2 decimals,... // for backfinder/optimizer
     public tradeTickLog = 200 // verbose logs in strategies every x trades
     public maxPriceDiffPercent = 0.05 // how much higher/lower compared to last price our buy/sell price will be
@@ -73,7 +74,7 @@ export class ServerConfig extends DatabaseObject {
     public storeLendingTrades = false;
     public restartPausedBotsMin = 605; // 0 = disabled - restart bots if paused to reduce memory usage on small vServer
     public saveStateMin = 60; // save the bot state for faster restarts after crashes. 0 = disabled
-    public minStrategyUpdateMs = 1200;
+    public minStrategyUpdateMs = 1000;
     public tradeNotifierClass = "TradeNotifier";
     public clearLogOnceProbability = 15;
     public maxClosePartialPercentage = 99.1;
@@ -142,7 +143,7 @@ export class ServerConfig extends DatabaseObject {
     public closeRatePercentOffset = 0.3; // how much higher/lower the max close rate shall be (for exchanges that don't support market orders)
     public maxSellPriseRise = 2.5 // how many times more coins the trader is allow to sell than buy (than specified in config)
     public removeOldLog = false // remove old logfiles on app start
-    public logTimeoutMin = 5 // after what time log entries from logOnce() can appear again
+    public logTimeoutMin = 30 // after what time log entries from logOnce() can appear again
     public uiLogLineCount = 100 // how many recent log lines to fetch when when web UI starts
     public restoreStateMaxAgeMin = 600 // after this time state will be discarded. use higher values if bot crashes more often
     public restoreStateFromOthers = true; // try to restore strategy states from other strategies with the same candle size
@@ -155,6 +156,7 @@ export class ServerConfig extends DatabaseObject {
     public fallbackTradingConfig = "Noop";
     public lastRestartTime: Date = null;
     public restartPreviouslyIntervalMin = 10; // how many minutes we shall count the restart as recent, before resetting all config on failure otherwise
+    public exchangesIdle = false;
 
     // moved to BrainConfig.pricePoints
     //public inputPricePoints = 10; // 11 // inputs per currency for neuroal network price predictions (for example input 10 and predict the 11th price)
@@ -262,6 +264,8 @@ export class ServerConfig extends DatabaseObject {
     public priceComparisonCoins = [Currency.BTC, Currency.ETH, Currency.XRP, Currency.BCH, Currency.EOS, Currency.STR, Currency.LTC,
             Currency.ADA, Currency.XMR, Currency.IOTA, Currency.DASH, Currency.TRX, Currency.TRX, Currency.BNB, Currency.XEM];
     public notifyCoinMarketApiErrors = true;
+    public socialCralerInstanceCount = 2;
+    public socialCrawlerDistributeSeed = "FooSeed234‚ƒfsd32l=)3f";
 
     public twitterApi = {
         consumerKey: '',
@@ -273,9 +277,12 @@ export class ServerConfig extends DatabaseObject {
     public twitterStatusBaseUrl = "https://twitter.com/statuses/"
     public pollTwitterDataSec = 2; // max 450 requests per 15 min
     public maxTwitterQueryLength = 500; // their docs say 500 - only for REST API (no comma separated queries)
+    public twitterSubscribeCurrencyNames = 150; // subscribe to the first x names + symbols, only symbols after
     public minCurrencyNameLengthSocial = 4;
     public twitterCurrencyTagFilter = ["amp", "bts", "omg", "pay", "game", "fun", "part", "dat", "gas", "via", "str", "nxt",
-        "smart", "pink", "note", "eng", "act", "storm", "hot", "ht", "bela",
+        "smart", "pink", "note", "eng", "act", "storm", "hot", "ht", "bela", "hc", "key", "geo", "cure", "bay", "wax", "med",
+        "melon", "metal", "monetha", "gulden", "stealth", "myriad", "wepower", "wabi", "shift", "salus", "sequence", "propy", "ost",
+        "ion", "incent", "holo", "gambit", "dynamic", "decent", "crown", "burst", "breakout", "adex",
         // currencies we might want to move to "required" filter
         "edo", "pasc", "salt", "sc", "cvc", "drop", "kin", "pot", "sky", "wtc", "rep"];
     // also for news
@@ -379,7 +386,13 @@ export function loadServerConfig(db, cb) {
     })
     */
     // easier solution: always use config from here and merge with local file. every user has his own bot
+    let currentConfig = nconf.get('serverConfig');
     let configObj = init({}) // create a default obj
+    OVERWRITE_PROPS.forEach((prop) => {
+        //delete configObj[prop];
+        if (currentConfig[prop] !== undefined)
+            configObj[prop] = currentConfig[prop];
+    });
     nconf.set('serverConfig', configObj);
     setTimeout(() => {
         cb && cb()
@@ -414,13 +427,17 @@ export function saveConfigLocal() {
         }
         saveConfigTimerID = setTimeout(() => {
             saveConfigTimerID = null;
-            nconf.save(null, (err) => {
-                if (err)
-                    logger.error("Error saving config locally", err);
-                //resolve(); // always resolve
+            saveConfigQueue = saveConfigQueue.then(() => {
+                return new Promise((resolve, reject) => {
+                    nconf.save(null, (err) => {
+                        if (err)
+                            logger.error("Error saving config locally", err);
+                        resolve(); // always resolve
+                    });
+                })
             });
         }, 600);
-        setTimeout(resolve.bind(this), 600); // easy way: always resolve after timer
+        setTimeout(resolve.bind(this), 700); // easy way: always resolve later after timer to avoid issues when this is being called multiple times
     })
     // TODO add 2nd backup file and load from backup if 1st fails (invalid JSOn when crashing while saving)
 }
@@ -442,6 +459,22 @@ export function getServerObjFromArr(valuesArr, serverArr, name) {
     if (!serverObj)
         return null
     return serverObj;
+}
+
+export function isEmptyApiKeys(exchangeKeys: any) {
+    if (!exchangeKeys)
+        return true; // shouldn't happen
+    for (let name in exchangeKeys)
+    {
+        const keys: any[] = exchangeKeys[name];
+        for (let i = 0; i < keys.length; i++) {
+            for (let prop in keys[i]) {
+                if (typeof keys[i][prop] === "string" && keys[i][prop].trim().length !== 0)
+                    return false; // at least 1 key is set
+            }
+        }
+    }
+    return true;
 }
 
 /*
