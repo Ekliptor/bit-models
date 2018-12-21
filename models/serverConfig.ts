@@ -38,7 +38,7 @@ export class ServerConfig extends DatabaseObject {
     public defaultCandleSize = 5 // in minutes. used when a strategy candleSize == "default"
     public candleEqualPercent = 0.005 // consider candle price equal if abs % change <= this value
     public keepCandles = 100 // number of last candles strategies shall keep
-    public keepCandles1min = 10*24*60 // number of 1min candles to keep in strategies // 10 days
+    public keepCandles1min = 6*24*60 // number of 1min candles to keep in strategies // 6 days
     public keepCandlesArbitrageGroup = 10 // number of candles for exchange grouping to keep (before deletion because an exchange didn't send data)
     public notificationPauseMin = 180 // how long to wait before sending the same notification again (per strategy)
     public checkMargins = true
@@ -62,7 +62,7 @@ export class ServerConfig extends DatabaseObject {
     public tradeTickLog = 200 // verbose logs in strategies every x trades
     public maxPriceDiffPercent = 0.05 // how much higher/lower compared to last price our buy/sell price will be
     public orderBookUpdateDepth = 300
-    public futureContractType = "quarter"; // this_week   next_week   quarter
+    public futureContractType = "quarter"; // this_week   next_week   quarter // only used for OKEX
     public fallbackContractType = "next_week"; // if we can't open the primary contract type (spread too high). leave empty to disable it
     public openOppositePositions = false; // allow opening long and short positions at the same time (only supported by some exchanges)
     public mainStrategyAlwaysTrade = true; // don't allow other strategies to overwrite buy/sell events of main strategy (even with higher priority)
@@ -80,6 +80,7 @@ export class ServerConfig extends DatabaseObject {
     public maxClosePartialPercentage = 99.1;
     public checkUpdateIntervalH = 25; // don't set this too low because candles smaller than this interval will not get filled otherwise
     public loadConfigIntervalMin = 10; // save CPU
+    public marginTradingPartialAmountFromRealBalance = true; // trade with percentages of actual position size when using partial take-profit or stop-loss. Useful with manual trading
 
     public websocketPingMs = 30000 // keep alive ping for WebUI
 
@@ -163,6 +164,7 @@ export class ServerConfig extends DatabaseObject {
     public hiddenNeuronFactor = 0.7; // hidden neurons will be this value * inputNeurons + outputNeurons
     public consecutiveLearningSteps = true;
     public keepPredictionHistory = 150; // how many price predictions to keep in memory
+    public futureCoinPairs = ["USD_BTC", "USD_LTC", "USD_ETH", "USD_ETC", "USD_BTG", "USD_XRP", "USD_EOS"];
 
     // place all keys here. we don't run user specific configurations to keep the design simpler. each user has his own bot instance
     public apiKey = {
@@ -205,6 +207,12 @@ export class ServerConfig extends DatabaseObject {
                 marginNotification: 0.5
             }],
             BitMEX: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.03,
+                testnet: false
+            }],
+            Deribit: [{
                 key: "",
                 secret: "",
                 marginNotification: 0.03,
@@ -264,7 +272,7 @@ export class ServerConfig extends DatabaseObject {
     public priceComparisonCoins = [Currency.BTC, Currency.ETH, Currency.XRP, Currency.BCH, Currency.EOS, Currency.STR, Currency.LTC,
             Currency.ADA, Currency.XMR, Currency.IOTA, Currency.DASH, Currency.TRX, Currency.TRX, Currency.BNB, Currency.XEM];
     public notifyCoinMarketApiErrors = true;
-    public socialCralerInstanceCount = 2;
+    public socialCralerInstanceCount = 3;
     public socialCrawlerDistributeSeed = "FooSeed234‚ƒfsd32l=)3f";
 
     public twitterApi = {
@@ -277,7 +285,7 @@ export class ServerConfig extends DatabaseObject {
     public twitterStatusBaseUrl = "https://twitter.com/statuses/"
     public pollTwitterDataSec = 2; // max 450 requests per 15 min
     public maxTwitterQueryLength = 500; // their docs say 500 - only for REST API (no comma separated queries)
-    public twitterSubscribeCurrencyNames = 150; // subscribe to the first x names + symbols, only symbols after
+    public twitterSubscribeCurrencyNames = 120; // subscribe to the first x names + symbols, only symbols after
     public minCurrencyNameLengthSocial = 4;
     public twitterCurrencyTagFilter = ["amp", "bts", "omg", "pay", "game", "fun", "part", "dat", "gas", "via", "str", "nxt",
         "smart", "pink", "note", "eng", "act", "storm", "hot", "ht", "bela", "hc", "key", "geo", "cure", "bay", "wax", "med",
@@ -428,7 +436,7 @@ export function saveConfigLocal() {
         saveConfigTimerID = setTimeout(() => {
             saveConfigTimerID = null;
             saveConfigQueue = saveConfigQueue.then(() => {
-                return new Promise((resolve, reject) => {
+                return new Promise<void>((resolve, reject) => {
                     nconf.save(null, (err) => {
                         if (err)
                             logger.error("Error saving config locally", err);

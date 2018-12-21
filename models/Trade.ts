@@ -226,27 +226,6 @@ export function getInitFunctions(db) {
         },
         (callback) => {
             db.createIndex(COLLECTION_NAME, {
-                amount: 1 // asc
-            }, {
-                name: COLLECTION_NAME + 'AmountIndex'
-            }, callback);
-        },
-        (callback) => {
-            db.createIndex(COLLECTION_NAME, {
-                rate: 1 // asc
-            }, {
-                name: COLLECTION_NAME + 'RateIndex'
-            }, callback);
-        },
-        (callback) => {
-            db.createIndex(COLLECTION_NAME, {
-                type: 1 // asc
-            }, {
-                name: COLLECTION_NAME + 'TypeIndex'
-            }, callback);
-        },
-        (callback) => {
-            db.createIndex(COLLECTION_NAME, {
                 currencyPair: 1 // asc
             }, {
                 name: COLLECTION_NAME + 'CurrencyPairIndex'

@@ -72,6 +72,7 @@ export class BotTrade extends AbstractBotTrade {
     public fees: number = 0.0; // in percent
     // TODO add margin lending fees for margin trading. needs API calls to query them from exchange
     public arbitrage: boolean = false;
+    public paper: boolean = false;
 
     constructor(time: Date, market: LogTradeMarket, type: LogTradeType, exchange: Exchange, currencyPair: CurrencyPair) {
         super(time, market, type, exchange, currencyPair)

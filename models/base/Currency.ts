@@ -278,7 +278,7 @@ export enum Currency {
     MTL = 410,
     MUSIC = 411,
     //NAS = 412,
-    NBT = 413,
+    USNBT = 413,
     NCASH = 414,
     NLG = 415,
     NMR = 416,
@@ -628,7 +628,7 @@ export const CurrencyName = new Map([
     [Currency.MTL, ["Metal"]],
     [Currency.MUSIC, ["Musicoin"]],
     [Currency.NAS, ["Nebulas"]],
-    [Currency.NBT, ["NuBits"]],
+    [Currency.USNBT, ["NuBits"]],
     [Currency.NCASH, ["NucleusVision", "NucleusVision"]],
     [Currency.NLG, ["Gulden"]],
     [Currency.NMR, ["Numeraire"]],
@@ -757,7 +757,8 @@ export enum Exchange {
     BITFINEX = 5,
     BITTREX = 6,
     BINANCE = 7,
-    BITMEX = 8
+    BITMEX = 8,
+    DERIBIT = 9
 }
 
 export const ExchangeName = new Map([
@@ -767,7 +768,8 @@ export const ExchangeName = new Map([
     ["Bitfinex", Exchange.BITFINEX],
     ["Bittrex", Exchange.BITTREX],
     ["Binance", Exchange.BINANCE],
-    ["BitMEX", Exchange.BITMEX]
+    ["BitMEX", Exchange.BITMEX],
+    ["Deribit", Exchange.DERIBIT]
 ])
 
 //export const TwoKeyExchanges = new Set<string>(["Bitfinex"]);
