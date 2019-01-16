@@ -1,6 +1,6 @@
 {
   "name": "@ekliptor/bit-models",
-  "version": "1.0.46",
+  "version": "1.0.47",
   "description": "All database models shared by apps of the BitBrain project.",
   "main": "build/models",
   "typings": "build/models.d.ts",
@@ -9,7 +9,7 @@
   "author": "Ekliptor",
   "license": "UNLICENSED",
   "dependencies": {
-    "@ekliptor/apputils": "^0.1.3",
+    "@ekliptor/apputils": "^0.1.5",
     "elasticsearch": "^12.1.0",
     "mongodb": "^2.2.10"
   },
