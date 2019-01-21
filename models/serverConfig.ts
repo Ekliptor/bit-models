@@ -20,7 +20,7 @@ const DEFAULT_EXCHANGE_PROXY = []; // an array of proxy URLs to randomly choose 
 export const COLLECTION_NAME = 'serverConfig'
 // config values that can be changed by the user (and are not overwritten with default values) must be added here
 export const OVERWRITE_PROPS = ["name", "notificationMethod", "apiKey", "twitterApi", "user", "username", "password", "userToken",
-    "pausedTrading", "pausedOpeningPositions", "lastWorkingConfigName", "firstStart"];
+    "loggedIn", "lastUsername", "pausedTrading", "pausedOpeningPositions", "lastWorkingConfigName", "lastWorkingConfigTime", "firstStart", "configReset"];
 
 let saveConfigTimerID: NodeJS.Timer = null;
 let saveConfigQueue = Promise.resolve();
@@ -154,7 +154,9 @@ export class ServerConfig extends DatabaseObject {
     public pausedTrading = false
     public pausedOpeningPositions = false
     public lastWorkingConfigName = "Noop";
+    public lastWorkingConfigTime: Date = null;
     public fallbackTradingConfig = "Noop";
+    public lastWorkingResetConfigMin = 30;
     public lastRestartTime: Date = null;
     public restartPreviouslyIntervalMin = 10; // how many minutes we shall count the restart as recent, before resetting all config on failure otherwise
     public exchangesIdle = false;
@@ -217,6 +219,12 @@ export class ServerConfig extends DatabaseObject {
                 secret: "",
                 marginNotification: 0.03,
                 testnet: false
+            }],
+            CoinbasePro: [{
+                key: "",
+                secret: "",
+                passphrase: "",
+                marginNotification: 0.5
             }]
         },
         notify: {
@@ -230,6 +238,20 @@ export class ServerConfig extends DatabaseObject {
             apiKey: ""
         }
     }
+    public wizardStrategies: string[] = [
+        "TripleTrend", "TradingViewSignal", "WaveSurfer", "DayTrendFollower", "VolumeProfiler", "PivotSniper", "DirectionRunner", "IntervalExtremes",
+        "MACD", "DEMA",
+        // more technical
+        "RSI", "CCI", "MFI", "OBV", "KAMA", "STC",
+        // stops
+        "StopLossTurn", "StopLossTurnPartial", "EarlyStopLoss", "BollingerStop", "SARStop", "VolumeSpikeStopper", "WaveStopper", "TimeStop", "StopLossTime",
+        // profit
+        "TakeProfit", "TakeProfitPartial", "TakeProfitStochRSI", "ProtectProfit",
+        // others
+        "PriceSpikeDetector", "VolumeSpikeDetector", "OrderBookPressure", "OrderPartitioner",
+        "MakerFeeOrder", "OneTimeOrder",
+    ];
+    // do we also need individual recommended strategies per exchange?
 
     // Social Crawler config
     public minWordLenDetectCurrency = 5;
@@ -331,6 +353,7 @@ export class ServerConfig extends DatabaseObject {
     public username = "Ekliptor";
     public password = "";
     public loggedIn = false;
+    public lastUsername = "";
     // unique random string per user, idea: token-confirm-botNr from user.ts
     // currently used sha2(userTokenSeed + appDir + username)
     public userToken = "h9Ao3h14-SLlsJdfl324SDUfosUdfl34jljgfl34ewrwer";
@@ -347,6 +370,7 @@ export class ServerConfig extends DatabaseObject {
     public premiumConfigFileName = "sensorConfig.json";
     public userTokenSeed = "nSDfhwelk5uo3uoDJ45tesgsasnll2p23GGG";
     public firstStart: Date = null;
+    public configReset: boolean = false;
 
     public serverType = { // TODO add a json config file to machines and put server specific config here (number of backtest processes, ...)
         local: {},

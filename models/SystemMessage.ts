@@ -4,13 +4,26 @@ import {ObjectID} from "mongodb";
 
 export const COLLECTION_NAME = 'sysMessages' // prefix "system" will cause mongoclient to display it under "System" instead of "Collections"
 export const MAX_RESULTS = 8000
+export const SEEN_COUNT_CACHE_SEC = 30
 export const EXCLUDE_FIELDS = {
     text: 0,
     data: 0
 }
 
+class SeenCountCache {
+    public loadedTime: Date = new Date(0);
+    public count: number = 0;
+    constructor() {
+    }
+    public update(count: number) {
+        this.count = count;
+        this.loadedTime = new Date();
+    }
+}
+
 let connection = null
 let autoSave = true
+let lastSeenCache = new SeenCountCache();
 
 export interface MessageAttributes {
     sender?: string;
@@ -79,8 +92,15 @@ export class SystemMessageData {
     }
 
     static countNew(callback) {
+        if (lastSeenCache.loadedTime.getTime() + SEEN_COUNT_CACHE_SEC*60*1000 > Date.now()) {
+            setTimeout(() => { // returning sync might break the control flow of some calls
+                callback && callback(lastSeenCache.count)
+            }, 0)
+            return;
+        }
         let collection = connection.collection(COLLECTION_NAME)
         collection.count({seen: null}).then((count) => {
+            lastSeenCache.update(count);
             callback && callback(count)
         })
     }
@@ -118,9 +138,16 @@ export class SystemMessageData {
                 }, {
                     name: 'sysMesSubjectIndex'
                 }, (err, indexName) => {
-                    if (err)
-                        return callback && callback(err)
-                    callback && callback()
+                    connection.createIndex(COLLECTION_NAME, {
+                        seen: 1 // asc
+                    }, {
+                        background: true,
+                        name: 'sysMesSeenIndex'
+                    }, (err, indexName) => {
+                        if (err)
+                            return callback && callback(err)
+                        callback && callback()
+                    })
                 })
             })
         })

@@ -721,7 +721,11 @@ export class CurrencyPair {
         let parts = pairStr.split("_");
         if (parts.length !== 2)
             return null;
-        return new CurrencyPair(Currency[parts[0]], Currency[parts[1]]);
+        const from = Currency[parts[0]];
+        const to = Currency[parts[1]];
+        if (!from || !to)
+            return null;
+        return new CurrencyPair(from, to);
     }
 
     public static fromNr(nr: CurrencyPairNr) {
@@ -758,10 +762,11 @@ export enum Exchange {
     BITTREX = 6,
     BINANCE = 7,
     BITMEX = 8,
-    DERIBIT = 9
+    DERIBIT = 9,
+    COINBASEPRO = 10
 }
 
-export const ExchangeName = new Map([
+export const ExchangeName = new Map<string, Exchange>([
     ["Poloniex", Exchange.POLONIEX],
     ["OKEX", Exchange.OKEX],
     ["Kraken", Exchange.KRAKEN],
@@ -769,8 +774,33 @@ export const ExchangeName = new Map([
     ["Bittrex", Exchange.BITTREX],
     ["Binance", Exchange.BINANCE],
     ["BitMEX", Exchange.BITMEX],
-    ["Deribit", Exchange.DERIBIT]
-])
+    ["Deribit", Exchange.DERIBIT],
+    //["CoinbasePro", Exchange.COINBASEPRO] // not yet implemented
+]);
+
+export const ExchangeLink = new Map<string, string>([
+    ["Poloniex", "https://poloniex.com"],
+    ["OKEX", "https://www.okex.com"],
+    ["Kraken", "https://www.kraken.com"],
+    ["Bitfinex", "https://bitfinex.com"],
+    ["Bittrex", "https://bittrex.com"],
+    ["Binance", "https://www.binance.com/?ref=11886203"],
+    ["BitMEX", "https://www.bitmex.com/register/NPaVXP"],
+    ["Deribit", "https://www.deribit.com/reg-4328.975"],
+    ["CoinbasePro", "https://pro.coinbase.com"]
+]);
+
+export const ExchangeRecommendedPairs = new Map<string, string[]>([
+    ["Poloniex", ["BTC_ETH", "BTC_XRP", "BTC_LTC", "BTC_DOGE", "BTC_XMR", "USDC_BTC", "USDC_ETH", "USDC_XRP"]],
+    ["OKEX", ["USD_BTC", "USD_ETH", "USD_LTC", "USD_XRP", "USD_EOS", "USD_BCH"]],
+    ["Kraken", ["USD_BTC", "USD_ETH", "USD_BCH", "USD_LTC", "USD_DASH", "USD_XRP", "BTC_ETH", "BTC_BCH", "BTC_XRP"]],
+    ["Bitfinex", ["USD_BTC", "USD_ETH", "USD_XRP", "USD_EOS", "USD_BCH", "USD_LTC", "USD_IOTA", "USD_NEO", "BTC_ETH", "BTC_XRP", "BTC_BCH"]],
+    ["Bittrex", ["BTC_ETH","BTC_LTC", "BTC_BCH", "BTC_XRP", "BTC_XMR", "BTC_SC", "BTC_DASH", "BTC_TRX", "USD_BTC", "USD_ETH"]],
+    ["Binance", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "BTC_ETH", "BTC_LTC", "BTC_ETC", "BTC_BCH", "BTC_IOTA", "BTC_STEEM"]],
+    ["BitMEX", ["USD_BTC", "USD_ETH"]],
+    ["Deribit", ["USD_BTC"]],
+    ["CoinbasePro", ["USD_BTC", "USD_ETH", "USD_BCH", "USD_LTC", "USD_ETC"]]
+]);
 
 //export const TwoKeyExchanges = new Set<string>(["Bitfinex"]);
 
