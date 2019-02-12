@@ -239,15 +239,16 @@ export class ServerConfig extends DatabaseObject {
         }
     }
     public wizardStrategies: string[] = [
-        "TripleTrend", "TradingViewSignal", "WaveSurfer", "DayTrendFollower", "VolumeProfiler", "PivotSniper", "DirectionRunner", "IntervalExtremes",
-        "MACD", "DEMA",
+        "TripleTrend", "TradingViewSignal", "WaveSurfer", "DayTrendFollower", "VolumeProfiler", "PivotSniper", "DirectionRunner", "Ichimoku",
+        "IntervalExtremes", "MACD", "DEMA",
         // more technical
-        "RSI", "CCI", "MFI", "OBV", "KAMA", "STC",
+        "RSI", "CCI", "MFI", "OBV", "KAMA", "STC", "BollingerBouncer", "PingPong",
         // stops
         "StopLossTurn", "StopLossTurnPartial", "EarlyStopLoss", "BollingerStop", "SARStop", "VolumeSpikeStopper", "WaveStopper", "TimeStop", "StopLossTime",
         // profit
         "TakeProfit", "TakeProfitPartial", "TakeProfitStochRSI", "ProtectProfit",
         // others
+        "WeekPredictor", "UnlimitedMargin", "VolumeProfileControl",
         "PriceSpikeDetector", "VolumeSpikeDetector", "OrderBookPressure", "OrderPartitioner",
         "MakerFeeOrder", "OneTimeOrder",
     ];

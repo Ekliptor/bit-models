@@ -333,6 +333,7 @@ export enum Currency {
     XST = 465,
     XWC = 466,
     PRO = 467,
+    BTT = 468,
 
     USDT = 200, // US Dollar tethered, rates almost identical to US dollar
 
@@ -680,6 +681,7 @@ export const CurrencyName = new Map([
     [Currency.XMY, ["Myriad"]],
     [Currency.XST, ["Stealth"]],
     [Currency.XWC, ["WhiteCoin"]],
+    [Currency.BTT, ["BitTorrent", "Bit Torrent"]],
 
     [Currency.USD, ["US Dollar"]],
     [Currency.EUR, ["Euro"]]
@@ -734,6 +736,10 @@ export class CurrencyPair {
 
     public toString() {
         return Currency[this.from] + "_" + Currency[this.to]
+    }
+    
+    public valueOf() {
+        return this.from*1000000 + this.to;
     }
 
     public toNr(): CurrencyPairNr { // to reduce storage size in mongodb

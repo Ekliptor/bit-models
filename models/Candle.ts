@@ -1,7 +1,7 @@
+import * as utils from "@ekliptor/apputils";
 import {DatabaseObject} from "./base/DatabaseObject";
 import {CurrencyPair, Exchange} from "./base/Currency";
 import {Trade} from "./Trade";
-import * as crypto from "crypto";
 
 export const COLLECTION_NAME = 'candles'
 
@@ -46,6 +46,17 @@ export class Candle extends /*AssetAction*/DatabaseObject {
 
     public getPercentChange() {
         return ((this.close - this.open) / this.open) * 100; // ((y2 - y1) / y1)*100 - positive % if price is rising
+    }
+
+    public toString() {
+        return utils.sprintf("start %s, open %s, close %s", utils.date.toDateTimeStr(this.start, true, true),
+            this.open.toFixed(8), this.close.toFixed(8));
+    }
+    
+    public equals(o: any) {
+        if ((o instanceof Candle) === false)
+            return false;
+        return this.start.getTime() === o.start.getTime() && this.interval === o.interval && this.open === o.open && this.currencyPair.equals(o.currencyPair);
     }
 
     public static copy(candles: Candle[], withTrades = false) {

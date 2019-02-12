@@ -4,6 +4,7 @@ const nconf = utils.nconf
 import {DatabaseObject} from "./base/DatabaseObject";
 import * as crypto from "crypto";
 import * as os from "os";
+import {ReadPreference} from "mongodb";
 
 export const COLLECTION_NAME = 'processes'
 export const COUNT_ACTIVE_MIN = 5
@@ -72,11 +73,14 @@ export function setLastActive(db, process: Process = null, cb?) {
         // update the process in DB
         collection.updateOne({uniqueID: process.uniqueID}, process, {upsert: true}, (err, result) => {
             if (err)
-                return cb && cb(err);
+                //return cb && cb(err);
+                logger.error("Error updating process data", err);
             cb && cb();
         })
     }).catch((err) => {
-        cb && cb(err);
+        //cb && cb(err); // swallow it
+        logger.error("Error setting process active", err);
+        cb && cb();
     })
 }
 
@@ -89,7 +93,7 @@ export function getActiveCount(db, proc: Process = null) {
         collection.count({
             lastContact: {$gt: maxAge},
             uniqueID: {$ne: proc.uniqueID}                  // don't count this process (on restart)
-        }).then((count) => {
+        }, {readPreference: ReadPreference.SECONDARY_PREFERRED}).then((count) => {
             resolve(count)
         }).catch((err) => {
             logger.error("Error getting active process count", err);
