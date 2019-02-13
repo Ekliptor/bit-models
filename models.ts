@@ -6,6 +6,7 @@ import * as Candle from "./models/Candle";
 import * as Order from "./models/Order";
 import * as MarketOrder from "./models/MarketOrder";
 import * as LoanOrder from "./models/LoanOrder";
+import * as Liquidation from "./models/Liquidation";
 import * as SystemMessage from "./models/SystemMessage";
 import * as Trade from "./models/Trade";
 import * as TradeHistory from "./models/TradeHistory";
@@ -30,6 +31,6 @@ export {
     DatabaseObject, AssetAction, Currency,
 
     // main database models
-    Candle, Order, MarketOrder, LoanOrder, SystemMessage, Trade, TradeHistory, BotTrade, Ticker, TickerVolumeSpike, Funding, conversation, CoinMarketInfo, user, serverConfig,
+    Candle, Order, MarketOrder, LoanOrder, Liquidation, SystemMessage, Trade, TradeHistory, BotTrade, Ticker, TickerVolumeSpike, Funding, conversation, CoinMarketInfo, user, serverConfig,
     Process, SocialAction, SocialPost, Tweet, News, TrollShout
 };

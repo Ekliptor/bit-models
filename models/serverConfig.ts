@@ -242,7 +242,7 @@ export class ServerConfig extends DatabaseObject {
         "TripleTrend", "TradingViewSignal", "WaveSurfer", "DayTrendFollower", "VolumeProfiler", "PivotSniper", "DirectionRunner", "Ichimoku",
         "IntervalExtremes", "MACD", "DEMA",
         // more technical
-        "RSI", "CCI", "MFI", "OBV", "KAMA", "STC", "BollingerBouncer", "PingPong",
+        "RSI", "CCI", "MFI", "OBV", "KAMA", "STC", "BollingerBouncer", "PingPong", "StopHunter",
         // stops
         "StopLossTurn", "StopLossTurnPartial", "EarlyStopLoss", "BollingerStop", "SARStop", "VolumeSpikeStopper", "WaveStopper", "TimeStop", "StopLossTime",
         // profit
