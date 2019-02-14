@@ -1,13 +1,15 @@
 {
   "name": "@ekliptor/bit-models",
-  "version": "1.0.51",
+  "version": "1.0.52",
   "description": "All database models shared by apps of the BitBrain project.",
   "main": "build/models",
   "typings": "build/models.d.ts",
   "private": false,
   "bundleUpdate": true,
   "author": "Ekliptor",
-  "license": "UNLICENSED",
+  "license": "AGPL",
+  "homepage": "https://wolfbot.org",
+  "repository": "https://github.com/Ekliptor/bit-models.git",
   "dependencies": {
     "@ekliptor/apputils": "^0.1.5",
     "elasticsearch": "^12.1.0",
