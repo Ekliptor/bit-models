@@ -1,5 +1,6 @@
+import * as utils from "@ekliptor/apputils";
 import {DatabaseObject} from "./DatabaseObject";
-import {Currency, Exchange, CurrencyPair} from "./Currency";
+import {CurrencyPair, Exchange} from "./Currency";
 import {TradeType} from "../Trade";
 import * as crypto from "crypto";
 
@@ -18,6 +19,11 @@ export class AssetAction extends DatabaseObject {
 
     constructor() {
         super()
+    }
+
+    public toString() {
+        // TODO display TadeType as string (can't be imported from parent file)
+        return utils.sprintf("amount %s, rate %s, type %s, date %s", this.amount, this.rate, this.type, utils.test.getPassedTime(this.date.getTime()));
     }
 
     protected init(tradeID: string | number = "") {

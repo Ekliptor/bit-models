@@ -1,3 +1,4 @@
+import * as utils from "@ekliptor/apputils";
 import {AssetAction} from "./base/AssetAction";
 import {CurrencyPair, Exchange} from "./base/Currency";
 import {Candle} from "./Candle";
@@ -16,6 +17,21 @@ export enum TradeType {
     SELL = 2, // for orders: bid
     CLOSE = 3, // can be buy or sell (depending on if we are long or short) // not present for external trades (trade history and live trades)
     PENDING = 4 // for open market orders
+}
+
+export function getTradeTypeName(type: TradeType) {
+    switch (type) {
+        case TradeType.BUY:
+            return "buy";
+        case TradeType.SELL:
+            return "sell";
+        case TradeType.CLOSE:
+            return "close";
+        case TradeType.PENDING:
+            return "pending";
+        default:
+            utils.test.assertUnreachableCode(type);
+    }
 }
 
 export type MarginPositionType = "" | "long" | "short";
