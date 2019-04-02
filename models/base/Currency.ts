@@ -1,4 +1,5 @@
 import {ExternalTicker, Ticker} from "../Ticker";
+import {nconf} from "@ekliptor/apputils";
 
 // currencies stored as numbers in DB to save some bytes
 export enum Currency {
@@ -342,6 +343,7 @@ export enum Currency {
     EUR = 301,
     JPY = 302,
     GBP = 303,
+    THB = 304,
 
     ALL = 10000
 
@@ -769,7 +771,10 @@ export enum Exchange {
     BINANCE = 7,
     BITMEX = 8,
     DERIBIT = 9,
-    COINBASEPRO = 10
+    COINBASEPRO = 10,
+
+    // CCX lib exchanges
+    BXCO = 100
 }
 
 export const ExchangeName = new Map<string, Exchange>([
@@ -783,6 +788,8 @@ export const ExchangeName = new Map<string, Exchange>([
     ["Deribit", Exchange.DERIBIT],
     //["CoinbasePro", Exchange.COINBASEPRO] // not yet implemented
 ]);
+if (nconf.get("serverConfig:premium") === false)
+    ExchangeName.set("BxCo", Exchange.BXCO);
 
 export const ExchangeLink = new Map<string, string>([
     ["Poloniex", "https://poloniex.com"],
@@ -793,7 +800,8 @@ export const ExchangeLink = new Map<string, string>([
     ["Binance", "https://www.binance.com/?ref=11886203"],
     ["BitMEX", "https://www.bitmex.com/register/NPaVXP"],
     ["Deribit", "https://www.deribit.com/reg-4328.975"],
-    ["CoinbasePro", "https://pro.coinbase.com"]
+    ["CoinbasePro", "https://pro.coinbase.com"],
+    ["BxCo", "https://bx.in.th"]
 ]);
 
 export const ExchangeRecommendedPairs = new Map<string, string[]>([
@@ -804,7 +812,7 @@ export const ExchangeRecommendedPairs = new Map<string, string[]>([
     ["Bittrex", ["BTC_ETH","BTC_LTC", "BTC_BCH", "BTC_XRP", "BTC_XMR", "BTC_SC", "BTC_DASH", "BTC_TRX", "USD_BTC", "USD_ETH"]],
     ["Binance", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "BTC_ETH", "BTC_LTC", "BTC_ETC", "BTC_BCH", "BTC_IOTA", "BTC_STEEM"]],
     ["BitMEX", ["USD_BTC", "USD_ETH"]],
-    ["Deribit", ["USD_BTC"]],
+    ["Deribit", ["USD_BTC", "USD_ETH"]],
     ["CoinbasePro", ["USD_BTC", "USD_ETH", "USD_BCH", "USD_LTC", "USD_ETC"]]
 ]);
 

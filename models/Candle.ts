@@ -48,6 +48,10 @@ export class Candle extends /*AssetAction*/DatabaseObject {
         return ((this.close - this.open) / this.open) * 100; // ((y2 - y1) / y1)*100 - positive % if price is rising
     }
 
+    public getAveragePrice() {
+        return (this.low + this.high) / 2.0;
+    }
+
     public toString() {
         return utils.sprintf("start %s, open %s, close %s", utils.date.toDateTimeStr(this.start, true, true),
             this.open.toFixed(8), this.close.toFixed(8));

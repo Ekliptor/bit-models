@@ -42,6 +42,20 @@ export interface SimpleTrade {
     date: Date;
 }
 
+export class TradeAggregateMap extends Map<string, Trade[]> { // (currency pair, trades)
+    constructor() {
+        super();
+    }
+    public addTrade(currencyPairStr: string, trade: Trade) {
+        let existing = this.get(currencyPairStr);
+        if (existing === undefined) {
+            existing = [];
+            this.set(currencyPairStr, existing);
+        }
+        existing.push(trade);
+    }
+}
+
 export class Trade extends AssetAction {
     public tradeID: number;
     //public globalTradeID: number; // available on poloniex, not really needed

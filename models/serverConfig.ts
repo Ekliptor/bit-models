@@ -160,6 +160,23 @@ export class ServerConfig extends DatabaseObject {
     public lastRestartTime: Date = null;
     public restartPreviouslyIntervalMin = 10; // how many minutes we shall count the restart as recent, before resetting all config on failure otherwise
     public exchangesIdle = false;
+    public maxProcessRuntimeMin = 20;
+
+    public socketTimeoutMs = 10000                    // for spider and other browsers
+    public userAgents = [
+        // https://developers.whatismybrowser.com/useragents/explore/software_type_specific/web-browser/
+        // windows
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0',
+        'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',
+        'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393',
+        'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0',
+        'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
+        // osx
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.8 (KHTML, like Gecko)',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7'
+    ]
 
     // moved to BrainConfig.pricePoints
     //public inputPricePoints = 10; // 11 // inputs per currency for neuroal network price predictions (for example input 10 and predict the 11th price)
@@ -182,6 +199,7 @@ export class ServerConfig extends DatabaseObject {
             OKEX: [{
                 key: "",
                 secret: "",
+                passphrase: "",
                 marginNotification: 0.03,
                 proxy: DEFAULT_EXCHANGE_PROXY
             }],
@@ -225,6 +243,11 @@ export class ServerConfig extends DatabaseObject {
                 secret: "",
                 passphrase: "",
                 marginNotification: 0.5
+            }],
+            BxCo: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
             }]
         },
         notify: {
@@ -242,15 +265,17 @@ export class ServerConfig extends DatabaseObject {
         "TripleTrend", "TradingViewSignal", "WaveSurfer", "DayTrendFollower", "VolumeProfiler", "PivotSniper", "DirectionRunner", "Ichimoku",
         "IntervalExtremes", "MACD", "DEMA",
         // more technical
-        "RSI", "CCI", "MFI", "OBV", "KAMA", "STC", "BollingerBouncer", "PingPong", "StopHunter",
+        "RSI", "CCI", "MFI", "OBV", "KAMA", "STC", "BollingerBouncer", "PingPong", "StopHunter", "TrendlineScalper",
         // stops
         "StopLossTurn", "StopLossTurnPartial", "EarlyStopLoss", "BollingerStop", "SARStop", "VolumeSpikeStopper", "WaveStopper", "TimeStop", "StopLossTime",
+        "TrailingStopReverseEntry",
         // profit
         "TakeProfit", "TakeProfitPartial", "TakeProfitStochRSI", "ProtectProfit",
         // others
         "WeekPredictor", "UnlimitedMargin", "VolumeProfileControl",
+        "FishingNet", "SimpleAndShort",
         "PriceSpikeDetector", "VolumeSpikeDetector", "OrderBookPressure", "OrderPartitioner",
-        "MakerFeeOrder", "OneTimeOrder",
+        "MakerFeeOrder", "OneTimeOrder", "MarketMakerOffset"
     ];
     // do we also need individual recommended strategies per exchange?
 

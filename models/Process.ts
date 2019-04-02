@@ -1,6 +1,6 @@
 import * as utils from "@ekliptor/apputils";
 const nconf = utils.nconf
-    , logger = utils.logger
+    , logger = utils.logger;
 import {DatabaseObject} from "./base/DatabaseObject";
 import * as crypto from "crypto";
 import * as os from "os";
@@ -79,7 +79,7 @@ export function setLastActive(db, process: Process = null, cb?) {
         })
     }).catch((err) => {
         //cb && cb(err); // swallow it
-        logger.error("Error setting process active", err);
+        logger.warn("Error setting process active", err);
         cb && cb();
     })
 }

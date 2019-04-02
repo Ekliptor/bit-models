@@ -23,7 +23,7 @@ export class AssetAction extends DatabaseObject {
 
     public toString() {
         // TODO display TadeType as string (can't be imported from parent file)
-        return utils.sprintf("amount %s, rate %s, type %s, date %s", this.amount, this.rate, this.type, utils.test.getPassedTime(this.date.getTime()));
+        return utils.sprintf("amount: %s, rate: %s, type: %s, time ago: %s", this.amount, this.rate, this.type, utils.test.getPassedTime(this.date.getTime()));
     }
 
     protected init(tradeID: string | number = "") {
