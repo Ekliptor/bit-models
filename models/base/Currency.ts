@@ -759,6 +759,10 @@ export class CurrencyPair {
     public getQuote(): string {
         return Currency[this.to];
     }
+
+    public createSwitchedPair() {
+        return new CurrencyPair(this.to, this.from);
+    }
 }
 
 export enum Exchange {
@@ -772,9 +776,30 @@ export enum Exchange {
     BITMEX = 8,
     DERIBIT = 9,
     COINBASEPRO = 10,
+    BITSTAMP = 11,
+    CEXIO = 12,
+    COBINHOOD = 13,
+    GEMINI = 14,
+    HITBTC = 15,
+    HUOBI = 16,
+    KUCOIN = 17,
+    NOVA = 18,
+    BITFOREX = 19,
+    FCOIN = 20,
+    BIBOX = 21,
 
-    // CCX lib exchanges
-    BXCO = 100
+    // CCX lib minor exchanges
+    BXCO = 100,
+    LIQUID = 101,
+    YOBIT = 102,
+
+    //DIGIFINEX = 19,
+    //BW = 20,
+    //COINEAL = 21,
+    //FATBTC = 22,
+    //COINBENE = 23,
+    //BITMAX = 25,
+    //ZBG = 27,
 }
 
 export const ExchangeName = new Map<string, Exchange>([
@@ -786,10 +811,22 @@ export const ExchangeName = new Map<string, Exchange>([
     ["Binance", Exchange.BINANCE],
     ["BitMEX", Exchange.BITMEX],
     ["Deribit", Exchange.DERIBIT],
-    //["CoinbasePro", Exchange.COINBASEPRO] // not yet implemented
+    ["CoinbasePro", Exchange.COINBASEPRO],
+    ["Bitstamp", Exchange.BITSTAMP],
+    ["CexIo", Exchange.CEXIO],
+    ["Cobinhood", Exchange.COBINHOOD],
+    ["Gemini", Exchange.GEMINI],
+    ["HitBTC", Exchange.HITBTC],
+    ["Huobi", Exchange.HUOBI],
+    ["KuCoin", Exchange.KUCOIN],
+    ["Nova", Exchange.NOVA],
+    ["BitForex", Exchange.BITFOREX],
+    ["FCoin", Exchange.FCOIN],
+    ["Bibox", Exchange.BIBOX],
+    ["BxCo", Exchange.BXCO],
+    ["Liquid", Exchange.LIQUID],
+    ["YoBit", Exchange.YOBIT],
 ]);
-if (nconf.get("serverConfig:premium") === false)
-    ExchangeName.set("BxCo", Exchange.BXCO);
 
 export const ExchangeLink = new Map<string, string>([
     ["Poloniex", "https://poloniex.com"],
@@ -801,7 +838,20 @@ export const ExchangeLink = new Map<string, string>([
     ["BitMEX", "https://www.bitmex.com/register/NPaVXP"],
     ["Deribit", "https://www.deribit.com/reg-4328.975"],
     ["CoinbasePro", "https://pro.coinbase.com"],
-    ["BxCo", "https://bx.in.th"]
+    ["Bitstamp", "https://www.bitstamp.net"],
+    ["CexIo", "https://cex.io"],
+    ["Cobinhood", "https://cobinhood.com"],
+    ["Gemini", "https://gemini.com"],
+    ["HitBTC", "https://hitbtc.com"],
+    ["Huobi", "https://huobi.com"],
+    ["KuCoin", "https://www.kucoin.com"],
+    ["Nova", "https://novaexchange.com"],
+    ["BitForex", "https://www.bitforex.com"],
+    ["FCoin", "https://www.fcoin.com"],
+    ["Bibox", "https://www.bibox.com"],
+    ["BxCo", "https://bx.in.th"],
+    ["Liquid", "https://www.liquid.com"],
+    ["YoBit", "https://yobit.net"]
 ]);
 
 export const ExchangeRecommendedPairs = new Map<string, string[]>([
@@ -813,7 +863,20 @@ export const ExchangeRecommendedPairs = new Map<string, string[]>([
     ["Binance", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "BTC_ETH", "BTC_LTC", "BTC_ETC", "BTC_BCH", "BTC_IOTA", "BTC_STEEM"]],
     ["BitMEX", ["USD_BTC", "USD_ETH"]],
     ["Deribit", ["USD_BTC", "USD_ETH"]],
-    ["CoinbasePro", ["USD_BTC", "USD_ETH", "USD_BCH", "USD_LTC", "USD_ETC"]]
+    ["CoinbasePro", ["USD_BTC", "USD_ETH", "USD_BCH", "USD_LTC", "USD_ETC", "BTC_ETH", "BTC_BCH"]],
+    ["Bitstamp", ["USD_BTC", "USD_ETH", "USD_BCH", "EUR_BTC", "EUR_ETH", "EUR_BCH", "BTC_ETH", "BTC_BCH"]],
+    ["CexIo", ["USD_BTC", "USD_ETH", "USD_BCH", "EUR_BTC", "EUR_ETH", "EUR_BCH", "BTC_ETH", "BTC_BCH"]],
+    ["Cobinhood", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "BTC_ETH", "BTC_BCH"]],
+    ["Gemini", ["USD_BTC", "USD_ETH", "USD_BCH", "USD_LTC", "BTC_ETH", "BTC_BCH"]],
+    ["HitBTC", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "USDT_LTC", "USDT_XRP", "BTC_ETH", "BTC_BCH"]],
+    ["Huobi", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "USDT_LTC", "BTC_ETH", "BTC_BCH", "BTC_LTC"]],
+    ["KuCoin", ["USTD_BTC", "USDT_ETH", "USDT_BCH", "BTC_ETH", "BTC_BCH"]],
+    ["Nova", ["BTC_BCH", "BTC_LTC"]],
+    ["FCoin", ["USDT_BTC", "USDT_ETH", "USDT_LTC", "USDT_XRP", "BTC_ETH", "BTC_BCH"]],
+    ["Bibox", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "USDT_EOS", "BTC_ETH", "BTC_BCH"]],
+    ["BxCo", ["THB_BTC", "THB_ETH", "THB_BCH", "THB_OMG", "BTC_ETH", "BTC_BCH"]],
+    ["Liquid", ["JPY_BTC", "JPY_ETH", "JPY_BCH", "JPY_XRP", "BTC_ETH", "BTC_BCH"]],
+    ["YoBit", ["USD_BTC", "USD_ETH", "BTC_ETH", "BTC_BCH", "BTC_DASH", "BTC_ZEC"]],
 ]);
 
 //export const TwoKeyExchanges = new Set<string>(["Bitfinex"]);
