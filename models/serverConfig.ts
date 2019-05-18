@@ -37,9 +37,14 @@ export class ServerConfig extends DatabaseObject {
     public trendlineKeepDays = 14
     public defaultCandleSize = 5 // in minutes. used when a strategy candleSize == "default"
     public candleEqualPercent = 0.005 // consider candle price equal if abs % change <= this value
-    public keepCandles = 100 // number of last candles strategies shall keep
+    public keepCandles = 180 // number of last candles strategies shall keep
     public keepCandles1min = 6*24*60 // number of 1min candles to keep in strategies // 6 days
+    public serializeCandles = 140;
+    public serializeCandles1min = 1*24*60;
+    public keepTradesOnCandles = 1;
+    public keepTradesOnCandles1min = 4;
     public keepCandlesArbitrageGroup = 10 // number of candles for exchange grouping to keep (before deletion because an exchange didn't send data)
+    public arbitragePaperTradingBalance = 1000.0; // the min balance for arbitrage paper trading to develop strategies
     public notificationPauseMin = 180 // how long to wait before sending the same notification again (per strategy)
     public checkMargins = true
     public checkInstances = true
@@ -317,6 +322,17 @@ export class ServerConfig extends DatabaseObject {
                 secret: "",
                 marginNotification: 0.5
             }],
+            Peatio: [{
+                key: "",
+                secret: "",
+                domain: "",
+                marginNotification: 0.5
+            }],
+            LoggerEx: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
+            }],
         },
         notify: {
             Pushover: {
@@ -329,6 +345,8 @@ export class ServerConfig extends DatabaseObject {
             apiKey: ""
         }
     }
+
+    // setup wizard
     public wizardStrategies: string[] = [
         "TripleTrend", "TradingViewSignal", "WaveSurfer", "DayTrendFollower", "VolumeProfiler", "PivotSniper", "DirectionRunner", "Ichimoku",
         "IntervalExtremes", "MACD", "DEMA",
@@ -341,11 +359,15 @@ export class ServerConfig extends DatabaseObject {
         "TakeProfitAdvanced", "TakeProfit", "TakeProfitPartial", "TakeProfitStochRSI", "ProtectProfit",
         // others
         "WeekPredictor", "UnlimitedMargin", "VolumeProfileControl",
-        "FishingNet", "SimpleAndShort",
+        "FishingNet", "FishingStraight", "SimpleAndShort",
         "PriceSpikeDetector", "VolumeSpikeDetector", "OrderBookPressure", "OrderPartitioner",
         "MakerFeeOrder", "OneTimeOrder", "MarketMakerOffset"
     ];
     // do we also need individual recommended strategies per exchange?
+    public wizardCandleSizes: number[] = [
+        // alternatives to the default candle size
+        15, 30, 60, 120
+    ]
 
     // Social Crawler config
     public minWordLenDetectCurrency = 5;

@@ -67,14 +67,17 @@ export class Candle extends /*AssetAction*/DatabaseObject {
         let copy: Candle[] = [];
         candles.forEach((candle) => {
             let pair = new CurrencyPair(candle.currencyPair.from, candle.currencyPair.to)
+            let tradesData = candle.tradeData;
+            delete candle.tradeData; // save memory by avoiding to copy it
             let curCopy = Object.assign(new Candle(pair), candle);
+            candle.tradeData = tradesData;
             curCopy.currencyPair = pair;
             if (curCopy.upVolume === undefined) // to be compatible with reading old state files
                 curCopy.upVolume = 0.0;
             if (curCopy.downVolume === undefined)
                 curCopy.downVolume = 0.0;
-            if (!withTrades)
-                delete curCopy.tradeData;
+            if (withTrades)
+                curCopy.tradeData = tradesData; // never copy tradesData (keep references) to save RAM
             copy.push(curCopy)
         })
         return copy;

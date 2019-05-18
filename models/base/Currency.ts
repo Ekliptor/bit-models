@@ -335,6 +335,8 @@ export enum Currency {
     XWC = 466,
     PRO = 467,
     BTT = 468,
+    FTH = 469, // Peatio
+    TRST = 470,
 
     USDT = 200, // US Dollar tethered, rates almost identical to US dollar
 
@@ -684,6 +686,8 @@ export const CurrencyName = new Map([
     [Currency.XST, ["Stealth"]],
     [Currency.XWC, ["WhiteCoin"]],
     [Currency.BTT, ["BitTorrent", "Bit Torrent"]],
+    [Currency.FTH, ["Fiat Ethereum"]],
+    [Currency.TRST, ["WeTrust"]],
 
     [Currency.USD, ["US Dollar"]],
     [Currency.EUR, ["Euro"]]
@@ -793,6 +797,10 @@ export enum Exchange {
     LIQUID = 101,
     YOBIT = 102,
 
+    // other
+    PEATIO = 200,
+    LOGGER = 300,
+
     //DIGIFINEX = 19,
     //BW = 20,
     //COINEAL = 21,
@@ -826,6 +834,8 @@ export const ExchangeName = new Map<string, Exchange>([
     ["BxCo", Exchange.BXCO],
     ["Liquid", Exchange.LIQUID],
     ["YoBit", Exchange.YOBIT],
+    ["Peatio", Exchange.PEATIO],
+    ["LoggerEx", Exchange.LOGGER],
 ]);
 
 export const ExchangeLink = new Map<string, string>([
@@ -851,7 +861,9 @@ export const ExchangeLink = new Map<string, string>([
     ["Bibox", "https://www.bibox.com"],
     ["BxCo", "https://bx.in.th"],
     ["Liquid", "https://www.liquid.com"],
-    ["YoBit", "https://yobit.net"]
+    ["YoBit", "https://yobit.net"],
+    //["Peatio", "https://demo.openware.com/"], // don't show it in UI (yet)
+    //["LoggerEx", ""], // only for devs
 ]);
 
 export const ExchangeRecommendedPairs = new Map<string, string[]>([
@@ -877,6 +889,7 @@ export const ExchangeRecommendedPairs = new Map<string, string[]>([
     ["BxCo", ["THB_BTC", "THB_ETH", "THB_BCH", "THB_OMG", "BTC_ETH", "BTC_BCH"]],
     ["Liquid", ["JPY_BTC", "JPY_ETH", "JPY_BCH", "JPY_XRP", "BTC_ETH", "BTC_BCH"]],
     ["YoBit", ["USD_BTC", "USD_ETH", "BTC_ETH", "BTC_BCH", "BTC_DASH", "BTC_ZEC"]],
+    ["Peatio", ["USD_ETH"]],
 ]);
 
 //export const TwoKeyExchanges = new Set<string>(["Bitfinex"]);
