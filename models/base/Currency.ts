@@ -337,6 +337,7 @@ export enum Currency {
     BTT = 468,
     FTH = 469, // Peatio
     TRST = 470,
+    MTC = 471,
 
     USDT = 200, // US Dollar tethered, rates almost identical to US dollar
 
@@ -688,6 +689,7 @@ export const CurrencyName = new Map([
     [Currency.BTT, ["BitTorrent", "Bit Torrent"]],
     [Currency.FTH, ["Fiat Ethereum"]],
     [Currency.TRST, ["WeTrust"]],
+    [Currency.MTC, ["MTC Mesh Network"]],
 
     [Currency.USD, ["US Dollar"]],
     [Currency.EUR, ["Euro"]]
