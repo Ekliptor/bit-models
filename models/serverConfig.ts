@@ -20,7 +20,7 @@ const DEFAULT_EXCHANGE_PROXY = []; // an array of proxy URLs to randomly choose 
 export const COLLECTION_NAME = 'serverConfig'
 // config values that can be changed by the user (and are not overwritten with default values) must be added here
 export const OVERWRITE_PROPS = ["name", "notificationMethod", "apiKey", "twitterApi", "user", "username", "password", "userToken",
-    "loggedIn", "lastUsername", "pausedTrading", "pausedOpeningPositions", "lastWorkingConfigName", "lastWorkingConfigTime", "firstStart", "configReset"];
+    "loggedIn", "lastUsername", "userConfigs", "pausedTrading", "pausedOpeningPositions", "lastWorkingConfigName", "lastWorkingConfigTime", "firstStart", "configReset"];
 
 let saveConfigTimerID: NodeJS.Timer = null;
 let saveConfigQueue = Promise.resolve();
@@ -44,6 +44,7 @@ export class ServerConfig extends DatabaseObject {
     public keepTradesOnCandles = 1;
     public keepTradesOnCandles1min = 4;
     public keepCandlesArbitrageGroup = 10 // number of candles for exchange grouping to keep (before deletion because an exchange didn't send data)
+    public ensureCandleHourInterval = true; // generate candles (from trades) so that every candle interval divisible by 5min or 3min is emitted in sync with the clock
     public arbitragePaperTradingBalance = 1000.0; // the min balance for arbitrage paper trading to develop strategies
     public notificationPauseMin = 180 // how long to wait before sending the same notification again (per strategy)
     public checkMargins = true
@@ -470,6 +471,7 @@ export class ServerConfig extends DatabaseObject {
     public password = "";
     public loggedIn = false;
     public lastUsername = "";
+    public userConfigs: string[] = [];
     // unique random string per user, idea: token-confirm-botNr from user.ts
     // currently used sha2(userTokenSeed + appDir + username)
     public userToken = "h9Ao3h14-SLlsJdfl324SDUfosUdfl34jljgfl34ewrwer";
@@ -481,6 +483,7 @@ export class ServerConfig extends DatabaseObject {
     public checkLoginUrl = ""; // the API url for premium bot login
     public updateApiKeyUrl = "";
     public checkLoginApiKey = "";
+    public premiumIdSeed = "";
     public checkLoginIntervalMin = 60;
     public notifyBeforeSubscriptionExpirationDays = 3;
     public premiumConfigFileName = "sensorConfig.json";

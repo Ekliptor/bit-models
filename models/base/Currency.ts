@@ -338,6 +338,7 @@ export enum Currency {
     FTH = 469, // Peatio
     TRST = 470,
     MTC = 471,
+    ATOM = 472,
 
     USDT = 200, // US Dollar tethered, rates almost identical to US dollar
 
@@ -690,6 +691,7 @@ export const CurrencyName = new Map([
     [Currency.FTH, ["Fiat Ethereum"]],
     [Currency.TRST, ["WeTrust"]],
     [Currency.MTC, ["MTC Mesh Network"]],
+    [Currency.ATOM, ["Cosmos"]],
 
     [Currency.USD, ["US Dollar"]],
     [Currency.EUR, ["Euro"]]
