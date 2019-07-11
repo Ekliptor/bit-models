@@ -128,6 +128,7 @@ export class ServerConfig extends DatabaseObject {
     public parentBacktestTickMs = 1000;
     public importTickIntervalMs = 3000;
     public importWarmupAddPercent = 20; // how many percent more the "max candles" shall be imported
+    public showRecentTestCount = 10;
 
     public plot = {
         emaPeriod: 26
@@ -167,6 +168,7 @@ export class ServerConfig extends DatabaseObject {
     public restartPreviouslyIntervalMin = 10; // how many minutes we shall count the restart as recent, before resetting all config on failure otherwise
     public exchangesIdle = false;
     public maxProcessRuntimeMin = 20;
+    public copyOnlyFirstConfig = true; // only copy the 1st exchange + strategy group when creating a new config via copying existing one (easier to start using)
 
     public socketTimeoutMs = 10000                    // for spider and other browsers
     public userAgents = [
@@ -349,7 +351,7 @@ export class ServerConfig extends DatabaseObject {
 
     // setup wizard
     public wizardStrategies: string[] = [
-        "TripleTrend", "TradingViewSignal", "WaveSurfer", "DayTrendFollower", "VolumeProfiler", "PivotSniper", "DirectionRunner", "Ichimoku",
+        "TripleTrend", "TradingViewSignal", "WaveSurfer", "DayTrendFollower", "VolumeProfiler", "PivotSniper", "PivotPeaks", "DirectionRunner", "Ichimoku",
         "IntervalExtremes", "MACD", "DEMA",
         // more technical
         "RSI", "CCI", "MFI", "OBV", "KAMA", "STC", "BollingerBouncer", "PingPong", "StopHunter", "TrendlineScalper",
@@ -359,7 +361,7 @@ export class ServerConfig extends DatabaseObject {
         // profit
         "TakeProfitAdvanced", "TakeProfit", "TakeProfitPartial", "TakeProfitStochRSI", "ProtectProfit",
         // others
-        "WeekPredictor", "UnlimitedMargin", "VolumeProfileControl",
+        "WeekPredictor", "BitmexSwagger", "UnlimitedMargin", "VolumeProfileControl",
         "FishingNet", "FishingStraight", "SimpleAndShort",
         "PriceSpikeDetector", "VolumeSpikeDetector", "OrderBookPressure", "OrderPartitioner",
         "MakerFeeOrder", "OneTimeOrder", "MarketMakerOffset"
@@ -477,7 +479,7 @@ export class ServerConfig extends DatabaseObject {
     public userToken = "h9Ao3h14-SLlsJdfl324SDUfosUdfl34jljgfl34ewrwer";
     public user = {
         // object gets loaded and stored in DB (values here will be overwritten)
-        devMode: false,
+        devMode: true,
         restoreCfg: false
     }
     public checkLoginUrl = ""; // the API url for premium bot login

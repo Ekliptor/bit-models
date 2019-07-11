@@ -100,6 +100,24 @@ export class Candle extends /*AssetAction*/DatabaseObject {
         });
         return bars;
     }
+
+    public static fromTrade(trade: Trade, interval: number = 1): Candle {
+        let candle = new Candle(trade.currencyPair);
+        candle.interval = interval;
+        candle.start = trade.date;
+        candle.exchange = trade.exchange;
+        candle.open = trade.rate;
+        candle.high = candle.open;
+        candle.low = candle.open;
+        candle.close = candle.open;
+        candle.vwp = candle.open;
+        candle.volume = trade.amount;
+        // TODO what about upVolume + downVolume?
+        candle.trades = 1;
+        candle.tradeData = [trade];
+        // trend not possible without previous candle. set after open & close differs by adding more trades in CandleBatcher
+        return candle;
+    }
 }
 
 export function init(candle): Candle {
