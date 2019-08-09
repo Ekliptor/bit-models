@@ -342,6 +342,11 @@ export class ServerConfig extends DatabaseObject {
                 appToken: "",
                 receiver: "",
                 adminReceiver: ""
+            },
+            Telegram: {
+                receiver: "",
+                channel: "",
+                serverPort: 5142
             }
         },
         coinMarketCap: {
@@ -357,7 +362,7 @@ export class ServerConfig extends DatabaseObject {
         "RSI", "CCI", "MFI", "OBV", "KAMA", "STC", "BollingerBouncer", "PingPong", "StopHunter", "TrendlineScalper",
         // stops
         "StopLossTurn", "StopLossTurnPartial", "EarlyStopLoss", "BollingerStop", "SARStop", "VolumeSpikeStopper", "WaveStopper", "TimeStop", "StopLossTime",
-        "TrailingStopReverseEntry",
+        "TrailingStopReverseEntry", "TrailingStop",
         // profit
         "TakeProfitAdvanced", "TakeProfit", "TakeProfitPartial", "TakeProfitStochRSI", "ProtectProfit",
         // others
@@ -502,6 +507,11 @@ export class ServerConfig extends DatabaseObject {
         super()
     }
 }
+
+export const NotificationMethodLinks = new Map<string, string>([ // (method name, website URL)
+    ["Pushover", "https://pushover.net/"],
+    ["Telegram", "https://telegram.org/"]
+]);
 
 export function init(cfg): ServerConfig {
     //cfg = Object.assign(new ServerConfig(), cfg) // we need recursion

@@ -84,7 +84,7 @@ export function setLastActive(db, process: Process = null, cb?) {
     })
 }
 
-export function getActiveCount(db, proc: Process = null) {
+export function getActiveCount(db, proc: Process = null, returnError = false) {
     return new Promise<number>((resolve, reject) => {
         let collection = db.collection(COLLECTION_NAME)
         let maxAge = utils.date.dateAdd(new Date(), 'minute', -1*COUNT_ACTIVE_MIN)
@@ -97,6 +97,8 @@ export function getActiveCount(db, proc: Process = null) {
             resolve(count)
         }).catch((err) => {
             logger.error("Error getting active process count", err);
+            if (returnError === true)
+                return reject({txt: "Error getting active process count", err: err});
             resolve(0)
         })
     })

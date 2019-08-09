@@ -1,5 +1,5 @@
 import {ExternalTicker, Ticker} from "../Ticker";
-import {nconf} from "@ekliptor/apputils";
+
 
 // currencies stored as numbers in DB to save some bytes
 export enum Currency {
@@ -341,6 +341,7 @@ export enum Currency {
     ATOM = 472,
 
     USDT = 200, // US Dollar tethered, rates almost identical to US dollar
+    USDC = 201,
 
     // Fiat
     USD = 300,
@@ -354,8 +355,13 @@ export enum Currency {
     // Futures traded as BTC_USD with additional parameter contract_type: this_week next_week quarter
 }
 
-export function isCryptoCurrency(currency: Currency) {
+export function isCryptoCurrency(currency: Currency): boolean {
     return currency < 300 && currency !== 200; // thether is a crypto strictly speaking
+}
+
+export function isFiatCurrency(currency: Currency): boolean {
+    return currency === Currency.USD || currency === Currency.EUR || currency === Currency.JPY || currency === Currency.GBP
+        || currency === Currency.USDT || currency === Currency.USDC;
 }
 
 // mapping of Currency. needed for parsing trollbox & social media
@@ -427,7 +433,8 @@ export const CurrencyName = new Map([
     [Currency.XBC, ["BitcoinPlus", "Bitcoin Plus"]],
     [Currency.XPM, ["Primecoin"]],
     [Currency.XVC, ["Vcash"]],
-    [Currency.USDT, ["US Dollar Tethered"]],
+    [Currency.USDT, ["US Dollar Tethered", "Tether"]],
+    [Currency.USDC, ["USDCoin"]],
     [Currency.BCH, ["Bitcoin Cash", "BitcoinCash", "BCC", "BCash"]], // BitConnect is dead, Bittrex calls it BCC
     [Currency.EOS, ["EOS"]],
     [Currency.IOTA, ["IOTA", "MIOTA"]],
@@ -729,12 +736,21 @@ export class CurrencyPair {
         this.to = to;
     }
 
-    public static fromString(pairStr: string): CurrencyPair {
+    public static fromString(pairStr: string, logFn?: (...msgArgs: string[]) => void): CurrencyPair {
         let parts = pairStr.split("_");
-        if (parts.length !== 2)
+        if (parts.length !== 2) {
+            if (logFn)
+                logFn("Currency pair must contain exactly 1 underscore _ " + pairStr);
             return null;
+        }
         const from = Currency[parts[0]];
         const to = Currency[parts[1]];
+        if (logFn) {
+            if (!from)
+                logFn("Unrecognized base currency: " + parts[0]);
+            if (!to)
+                logFn("Unrecognized quote currency: " + parts[1]);
+        }
         if (!from || !to)
             return null;
         return new CurrencyPair(from, to);
@@ -747,7 +763,7 @@ export class CurrencyPair {
     public toString() {
         return Currency[this.from] + "_" + Currency[this.to]
     }
-    
+
     public valueOf() {
         return this.from*1000000 + this.to;
     }
@@ -898,9 +914,12 @@ export const ExchangeRecommendedPairs = new Map<string, string[]>([
 
 //export const TwoKeyExchanges = new Set<string>(["Bitfinex"]);
 
-export const NotificationMethods = new Map([
+export const PassphraseExchanges = new Set<string>(["OKEX", "CoinbasePro"]);
+
+// moved to serverConfig with links
+/*export const NotificationMethods = new Map([
     ["Pushover", true]
-])
+])*/
 
 export enum TradingAccount {
     EXCHANGE = 1,
