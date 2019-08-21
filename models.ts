@@ -14,6 +14,7 @@ import * as BotTrade from "./models/BotTrade";
 import * as Ticker from "./models/Ticker";
 import * as TickerVolumeSpike from "./models/TickerVolumeSpike";
 import * as Funding from "./models/Funding";
+import * as FundingRate from "./models/FundingRate";
 import * as conversation from "./models/conversation";
 import * as CoinMarketInfo from "./models/CoinMarketInfo";
 import * as user from "./models/user";
@@ -31,6 +32,6 @@ export {
     DatabaseObject, AssetAction, Currency,
 
     // main database models
-    Candle, Order, MarketOrder, LoanOrder, Liquidation, SystemMessage, Trade, TradeHistory, BotTrade, Ticker, TickerVolumeSpike, Funding, conversation, CoinMarketInfo, user, serverConfig,
+    Candle, Order, MarketOrder, LoanOrder, Liquidation, SystemMessage, Trade, TradeHistory, BotTrade, Ticker, TickerVolumeSpike, Funding, FundingRate, conversation, CoinMarketInfo, user, serverConfig,
     Process, SocialAction, SocialPost, Tweet, News, TrollShout
 };

@@ -6,6 +6,7 @@ import {CurrencyPair, Exchange} from "./base/Currency";
 import {TradeType} from "./Trade";
 
 
+export const COLLECTION_NAME = 'liquidations'
 export type LiquidationType = "buy" | "sell";
 
 export class Liquidation extends AssetAction {
@@ -28,4 +29,62 @@ export class Liquidation extends AssetAction {
         }
         return liq;
     }
+}
+
+export function storeLiquidations(db, liquidations: Liquidation[], cb) {
+    if (!liquidations || liquidations.length === 0)
+        return cb && cb();
+    let storeList = [];
+    for (let i = 0; i < liquidations.length; i++)
+    {
+        let liq = Object.assign({}, liquidations[i]);
+        liq.currencyPair = liq.currencyPair.toNr();
+        storeList.push(liq)
+    }
+    let collection = db.collection(COLLECTION_NAME)
+    // we have to use ordered == false to continue inserting on duplicate key
+    collection.insertMany(storeList, {ordered: false}, (err, result) => {
+        if (err) {
+            if (err.code !== 11000) // ignore duplicate key errors
+                return cb && cb(err);
+        }
+        cb && cb()
+    })
+}
+
+export function getInitFunctions(db) {
+    return [
+        (callback) => {
+            db.createCollection(COLLECTION_NAME, callback);
+        },
+        (callback) => {
+            db.createIndex(COLLECTION_NAME, {
+                uniqueID: 1 // asc
+            }, {
+                name: COLLECTION_NAME + 'UniqueIdIndex',
+                unique: true
+            }, callback);
+        },
+        (callback) => {
+            db.createIndex(COLLECTION_NAME, {
+                date: 1 // asc
+            }, {
+                name: COLLECTION_NAME + 'DateIndex'
+            }, callback);
+        },
+        (callback) => {
+            db.createIndex(COLLECTION_NAME, {
+                currencyPair: 1 // asc
+            }, {
+                name: COLLECTION_NAME + 'CurrencyPairIndex'
+            }, callback);
+        },
+        (callback) => {
+            db.createIndex(COLLECTION_NAME, {
+                exchange: 1 // asc
+            }, {
+                name: COLLECTION_NAME + 'ExchangeIndex'
+            }, callback);
+        }
+    ];
 }

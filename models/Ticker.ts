@@ -74,6 +74,15 @@ export abstract class AbstractTicker extends DatabaseObject {
     // for index based exchanges (such as futures)
     public indexValue?: number;
 
+    // for future contracts
+    public turnover?: number;
+    public openInterest?: number;
+    public openValue?: number;
+
+    // for perpetual future contracts
+    public fundingIntervalH?: number;
+    public fundingRate?: number; // per interval
+
     constructor(exchange: Exchange) {
         super()
         this.exchange = exchange;
