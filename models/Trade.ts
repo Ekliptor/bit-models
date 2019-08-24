@@ -213,6 +213,13 @@ export function initMany(trades: any[]): Trade[] {
     return trades
 }
 
+/**
+ * Adds trades to the database for backtesting.
+ * Make sure to call TradeHistory.addToHistory() after importing a date-range of trades.
+ * @param db
+ * @param trades
+ * @param cb
+ */
 export function storeTrades(db, trades: Trade[], cb) {
     if (!trades || trades.length === 0)
         return cb && cb();

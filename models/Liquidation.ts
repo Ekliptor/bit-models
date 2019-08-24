@@ -31,6 +31,16 @@ export class Liquidation extends AssetAction {
     }
 }
 
+export function init(doc): Liquidation {
+    return Object.assign(new Liquidation(), doc)
+}
+
+export function initMany(docs: any[]): Liquidation[] {
+    for (let i = 0; i < docs.length; i++)
+        docs[i] = init(docs[i])
+    return docs
+}
+
 export function storeLiquidations(db, liquidations: Liquidation[], cb) {
     if (!liquidations || liquidations.length === 0)
         return cb && cb();

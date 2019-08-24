@@ -22,6 +22,7 @@ import * as serverConfig from "./models/serverConfig";
 import * as Process from "./models/Process";
 
 import * as SocialAction from "./models/Social/SocialAction";
+import * as FearGreedIndex from "./models/Social/FearGreedIndex";
 import * as SocialPost from "./models/Social/SocialPost";
 import * as Tweet from "./models/Social/Tweet";
 import * as News from "./models/Social/News";
@@ -33,5 +34,5 @@ export {
 
     // main database models
     Candle, Order, MarketOrder, LoanOrder, Liquidation, SystemMessage, Trade, TradeHistory, BotTrade, Ticker, TickerVolumeSpike, Funding, FundingRate, conversation, CoinMarketInfo, user, serverConfig,
-    Process, SocialAction, SocialPost, Tweet, News, TrollShout
+    Process, SocialAction, FearGreedIndex, SocialPost, Tweet, News, TrollShout
 };

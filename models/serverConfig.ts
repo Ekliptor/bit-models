@@ -53,6 +53,8 @@ export class ServerConfig extends DatabaseObject {
     public monitoringInstanceDir = "_monitor";
     public instanceApiCheckRepeatingSec = 30 // check again after x seconds befor terminating the instance
     public assumeBotCrashedMin = 11 // after we get no response for this time we assume the bot is not starting (errors on startup)
+    public notifyInstanceLowRuntimeH = 24 // notify that a bot has likely problems due to low runtime if it hasn't been running instanceRuntimeOkH for notifyInstanceLowRuntimeH
+    public instanceRuntimeOkH = 2
     public httpTimeoutMs = 130*1000 // > 2min // poloniex msg: This IP has been banned for 2 minutes. Please adjust your timeout to 130 seconds.
     public websocketTimeoutMs = 35000 // after how long we will reset the connection to the exchange if we don't receive any trades
     public httpPollIntervalSec = 20 // for exchanges without websocket support
@@ -87,6 +89,7 @@ export class ServerConfig extends DatabaseObject {
     public checkUpdateIntervalH = 25; // don't set this too low because candles smaller than this interval will not get filled otherwise
     public loadConfigIntervalMin = 10; // save CPU
     public marginTradingPartialAmountFromRealBalance = true; // trade with percentages of actual position size when using partial take-profit or stop-loss. Useful with manual trading
+    public fixedLimitOrderExpirationH = 96;
 
     public websocketPingMs = 30000 // keep alive ping for WebUI
 
@@ -135,7 +138,7 @@ export class ServerConfig extends DatabaseObject {
     }
 
     public tradeMode = 2 // 1 = SIMULATION, 2 = LIVE
-    public holdMin = 1 // how many minutes we have to hold a coin at least after a trade
+    public holdMin = 0 // 1 // how many minutes we have to hold a coin at least after a trade // bad idea for spreading limit orders
     public canAlwaysClose = true // "close" orders can happen even if "holdMin" hasn't passed
     public canTradeImmediatelyAfterClose = true // we can place new buy/sell orders after closing a position without waiting for "holdMin"
     public orderTimeoutSec = 600 // cancel orders that haven't been filled after this time
@@ -411,6 +414,11 @@ export class ServerConfig extends DatabaseObject {
     public rssFeedPollIntervalMin = 30;
     public checkTelegramRunningMin = 120;
 
+    public liveTradeCountBulkInsertStep = 5000;
+    public liveTradeImportRestartGraceTimeH = 2; // how long a restart/update can take at most and we still consider the trade history to be "complete"
+    public storeTickerIntervalMin = 60;
+    public liveLiquidationCountBulkInsertStep = 5;
+
     public coinMarketInfoDisplayAgeDays = 7;
     public cleanupPriceDataIntervalDays = 1;
     public priceDataDeleteOldDays = 14;
@@ -485,7 +493,8 @@ export class ServerConfig extends DatabaseObject {
     public user = {
         // object gets loaded and stored in DB (values here will be overwritten)
         devMode: true,
-        restoreCfg: false
+        restoreCfg: false,
+        sendTestNotificationOnRestart: null // object with message data
     }
     public checkLoginUrl = ""; // the API url for premium bot login
     public updateApiKeyUrl = "";
