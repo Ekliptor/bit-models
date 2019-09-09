@@ -591,12 +591,15 @@ export async function saveConfig(db, configObj: ServerConfig): Promise<void> {
     }
 }
 
-export function saveConfigLocal() {
+export function saveConfigLocal(saveAsChildProcess: boolean = false) {
     return new Promise<void>((resolve, reject) => {
         if (saveConfigTimerID !== null) { // delay saving because this might be called multiple times at once
             clearTimeout(saveConfigTimerID);
             saveConfigTimerID = null;
         }
+        // skip saving config for process.env.IS_CHILD to prevent possible overwrite/corrupted data
+        if (saveAsChildProcess === false && process.env.IS_CHILD)
+            return resolve();
         saveConfigTimerID = setTimeout(() => {
             saveConfigTimerID = null;
             saveConfigQueue = saveConfigQueue.then(() => {
