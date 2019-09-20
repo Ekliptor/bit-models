@@ -66,10 +66,17 @@ export class ServerConfig extends DatabaseObject {
     }
     public forwardTradesSec = 1; // limit how often we forward trades to strategies to save CPU
     public forwardTradesAddPerMarketSec = 1.3;
+    public maxDelayedTradesMs = 2600; // if trade updates are delayed by more than this we will increase our forwardTradesSec by increaseTradeDynamicSec
+    public increaseTradeDynamicSec = 1.1;
+    public upperLimitDelayMs = 16000;
+    public delayIgnoreIncresseMs = 3000; // if trades are delayed by more than this we assume connection issues (or really no trades). The dynamic delay is already subtraced, so it's WITHOUT it
+    public minTradeCountForIncrease = 100;
+
     public optimizeNumberDecimals = 10; // 10 = 1 decimal, 100 = 2 decimals,... // for backfinder/optimizer
     public tradeTickLog = 200 // verbose logs in strategies every x trades
     public maxPriceDiffPercent = 0.05 // how much higher/lower compared to last price our buy/sell price will be
     public orderBookUpdateDepth = 300
+    public maxBidAskToLastTradeSpreadPerc = 3.0; // if the spread is higher than this we assume that our order book is out of sync
     public futureContractType = "quarter"; // this_week   next_week   quarter // only used for OKEX
     public fallbackContractType = "next_week"; // if we can't open the primary contract type (spread too high). leave empty to disable it
     public openOppositePositions = false; // allow opening long and short positions at the same time (only supported by some exchanges)
