@@ -862,7 +862,7 @@ export const ExchangeLink = new Map<string, string>([
     ["Poloniex", "https://poloniex.com"],
     ["OKEX", "https://www.okex.com"],
     ["Kraken", "https://www.kraken.com"],
-    ["Bitfinex", "https://bitfinex.com"],
+    ["Bitfinex", "https://bitfinex.com/?refcode=o58eGlJa"],
     ["Bittrex", "https://bittrex.com"],
     ["Binance", "https://www.binance.com/?ref=11886203"],
     ["BitMEX", "https://www.bitmex.com/register/NPaVXP"],

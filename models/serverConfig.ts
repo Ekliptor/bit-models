@@ -47,6 +47,7 @@ export class ServerConfig extends DatabaseObject {
     public ensureCandleHourInterval = true; // generate candles (from trades) so that every candle interval divisible by 5min or 3min is emitted in sync with the clock
     public arbitragePaperTradingBalance = 1000.0; // the min balance for arbitrage paper trading to develop strategies
     public notificationPauseMin = 180 // how long to wait before sending the same notification again (per strategy)
+    public tradeNotificationPauseMin = 1; // lower value for executed trade notifications
     public checkMargins = true
     public checkInstances = true
     public instanceCount = 6
@@ -82,7 +83,7 @@ export class ServerConfig extends DatabaseObject {
     public openOppositePositions = false; // allow opening long and short positions at the same time (only supported by some exchanges)
     public mainStrategyAlwaysTrade = true; // don't allow other strategies to overwrite buy/sell events of main strategy (even with higher priority)
     public updatePortfolioSec = 120;
-    public updateMarginPositionsSec = 300; // has to be >= updatePortfolioSec
+    public updateMarginPositionsSec = 239; // has to be >= updatePortfolioSec
     public delayFirstEmitSyncSec = 60; // ensure strategies are initialized. means that balances show later in the UI
     public strategyRunOnceIntervalH = 12;
     public storeTrades = false; // in live mode
@@ -119,7 +120,7 @@ export class ServerConfig extends DatabaseObject {
             // best parameters for June 2017 for ETH on poloniex: down -0.55, up 0.02 -> 163%
             // TODO detect weekly up and down trends and adjust parameters dynamically?
             persistence: 1, // starting at 1 = open immediately
-            sidewaysPercent: 3.5
+            sidewaysPercent: 3.5 // sideways market if the percentage between current candle and action.long number of candles back is <
         }
     }
 
