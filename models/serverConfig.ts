@@ -45,6 +45,9 @@ export class ServerConfig extends DatabaseObject {
     public keepTradesOnCandles1min = 4;
     public keepCandlesArbitrageGroup = 10 // number of candles for exchange grouping to keep (before deletion because an exchange didn't send data)
     public ensureCandleHourInterval = true; // generate candles (from trades) so that every candle interval divisible by 5min or 3min is emitted in sync with the clock
+    public restartLastCandleTickMin = 120; // restart the bot if the last candle tick is greater than this (and greater than candle size) when doing trading/arbitrage
+    public restart1MinCandleTimePassedMin = 10; // how long ago the last 1min has to be at least to allow a restart
+    public checkRestartIntervalMin = 30; // how often to check if restartLastCandleTickMin has passed
     public arbitragePaperTradingBalance = 1000.0; // the min balance for arbitrage paper trading to develop strategies
     public notificationPauseMin = 180 // how long to wait before sending the same notification again (per strategy)
     public tradeNotificationPauseMin = 1; // lower value for executed trade notifications
@@ -171,6 +174,7 @@ export class ServerConfig extends DatabaseObject {
     public searchAllPairsForState = true
     public pausedTrading = false
     public pausedOpeningPositions = false
+    public singleExchangeMode = true; // update exchange name in config if only 1 API key is set by user
     public lastWorkingConfigName = "Noop";
     public lastWorkingConfigTime: Date = null;
     public fallbackTradingConfig = "Noop";

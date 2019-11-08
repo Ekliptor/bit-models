@@ -1,3 +1,6 @@
+import * as utils from "@ekliptor/apputils";
+const nconf = utils.nconf
+    , logger = utils.logger;
 import {DatabaseObject} from "./base/DatabaseObject";
 import {Currency, Exchange, CurrencyPair, ExchangeCurrencies} from "./base/Currency";
 import * as crypto from "crypto";
@@ -94,8 +97,7 @@ export abstract class AbstractTicker extends DatabaseObject {
 }
 
 export class Ticker extends AbstractTicker {
-    // not yet stored in DB
-    public currencyPair: CurrencyPair;
+    public currencyPair: CurrencyPair; // stored as object (not array)
 
 
     constructor(exchange: Exchange) {
@@ -175,6 +177,35 @@ export function initManyExternal(docs: any[]): ExternalTicker[] {
     for (let i = 0; i < docs.length; i++)
         docs[i] = initExternal(docs[i])
     return docs
+}
+
+/**
+ * Get the latest limit tickers. Generally tickers are stored once per hour.
+ * @param db
+ * @param exchange
+ * @param currencyPair
+ * @param end
+ * @param limit
+ * @param offset
+ */
+export async function getTickers(db, exchange: Exchange, currencyPair: CurrencyPair, end: Date, limit: number = 24, offset: number = 0): Promise<Ticker[]> {
+    let collection = db.collection(COLLECTION_NAME)
+    try {
+        let result = await collection.find({
+            exchange: exchange,
+            currencyPair: {
+                from: currencyPair.from,
+                to: currencyPair.to
+            },
+            created: {$lte: end}
+        }).sort({created: -1}).skip(offset).limit(limit).toArray();
+        if (result)
+            return initMany(result);
+    }
+    catch (err) {
+        logger.error("Error getting exchange tickers", err);
+    }
+    return [];
 }
 
 export function getInitFunctions(db) {
