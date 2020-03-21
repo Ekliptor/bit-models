@@ -61,7 +61,7 @@ export class ServerConfig extends DatabaseObject {
     public instanceRuntimeOkH = 2
     public httpTimeoutMs = 130*1000 // > 2min // poloniex msg: This IP has been banned for 2 minutes. Please adjust your timeout to 130 seconds.
     public websocketTimeoutMs = 35000 // after how long we will reset the connection to the exchange if we don't receive any trades
-    public httpPollIntervalSec = 20 // for exchanges without websocket support
+    public httpPollIntervalSec = 15 // for exchanges without websocket support
     public fetchTradesMinBack = 2
     public keepResponseTimes = {
         recent: 2,
@@ -81,7 +81,8 @@ export class ServerConfig extends DatabaseObject {
     public maxPriceDiffPercent = 0.05 // how much higher/lower compared to last price our buy/sell price will be
     public orderBookUpdateDepth = 300
     public maxBidAskToLastTradeSpreadPerc = 3.0; // if the spread is higher than this we assume that our order book is out of sync
-    public futureContractType = "quarter"; // this_week   next_week   quarter // only used for OKEX
+    public increaseBookSpreadForOrderPerc = 0.006; // adjust the order rate from bid/ask higher/lower to place limit order in makerMode
+    public futureContractType = "quarter"; // this_week   next_week   quarter  bi_quarter // only used for OKEX
     public fallbackContractType = "next_week"; // if we can't open the primary contract type (spread too high). leave empty to disable it
     public openOppositePositions = false; // allow opening long and short positions at the same time (only supported by some exchanges)
     public mainStrategyAlwaysTrade = true; // don't allow other strategies to overwrite buy/sell events of main strategy (even with higher priority)
@@ -135,13 +136,15 @@ export class ServerConfig extends DatabaseObject {
         slippage: 0.0, // in %, for example 0.05%
         cacheCandles: false,
         walk: true, // Walk Forward Analysis: load previously optimized parameters and continue optimizing on them
-        resetWarmupBacktestErrorSec: 30
+        resetWarmupBacktestErrorSec: 30,
+        timeOffsetMin: 0, // offset in minutes for candles on trade result graph. can be negative to move candles back in time (sooner)
     }
     public batchTrades = true;
     public exchangeImportDelayMs = 5000; // Bitfinex (and others?) need time to connect websockets
     public parentBacktestTickMs = 1000;
     public importTickIntervalMs = 3000;
     public importWarmupAddPercent = 20; // how many percent more the "max candles" shall be imported
+    public backtestImportToleranceMin = 30; // how many minutes can be missing from the end when running a backtest for warmup of live trading
     public showRecentTestCount = 10;
 
     public plot = {
@@ -153,6 +156,7 @@ export class ServerConfig extends DatabaseObject {
     public canAlwaysClose = true // "close" orders can happen even if "holdMin" hasn't passed
     public canTradeImmediatelyAfterClose = true // we can place new buy/sell orders after closing a position without waiting for "holdMin"
     public orderTimeoutSec = 600 // cancel orders that haven't been filled after this time
+    public checkOrdersFilledArbitrageSec = 10 // check if an order has been filled by querying all open orders during arbitrage mode
     public orderAdjustBeforeTimeoutFactor = 3.0 // move orders at orderTimeoutSec/orderAdjustBeforeTimeoutFactor (before they time out)
     public orderBookTimeoutSec = 90 // force reloading the orderbook snapshot if no updates happen for x seconds
     public maxRealtimeMarketOffsetSec = 120
@@ -184,6 +188,8 @@ export class ServerConfig extends DatabaseObject {
     public exchangesIdle = false;
     public maxProcessRuntimeMin = 20;
     public copyOnlyFirstConfig = true; // only copy the 1st exchange + strategy group when creating a new config via copying existing one (easier to start using)
+    public filterExchanges: string[] = ["BitMEX"]; // disable exchanges on startup after lastWorkingResetConfigMin if their connection is currently unstable
+    public replaceExchange: string = "Bitfinex"; // replace the exchanges from filterExchanges with an exchange with a more reliable connection
 
     public socketTimeoutMs = 10000                    // for spider and other browsers
     public userAgents = [
@@ -340,6 +346,21 @@ export class ServerConfig extends DatabaseObject {
                 secret: "",
                 marginNotification: 0.5
             }],
+            Coss: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
+            }],
+            Bybit: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
+            }],
+            Bitkub: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
+            }],
             Peatio: [{
                 key: "",
                 secret: "",
@@ -368,6 +389,8 @@ export class ServerConfig extends DatabaseObject {
             apiKey: ""
         }
     }
+    public binanceBrokerID = "ygVUXNEk"; // futures
+    public binanceBrokerIDSpot = "C8SHZE5L";
 
     // setup wizard
     public wizardStrategies: string[] = [
@@ -384,7 +407,7 @@ export class ServerConfig extends DatabaseObject {
         "WeekPredictor", "BitmexSwagger", "UnlimitedMargin", "VolumeProfileControl",
         "FishingNet", "FishingStraight", "SimpleAndShort",
         "PriceSpikeDetector", "VolumeSpikeDetector", "OrderBookPressure", "OrderPartitioner",
-        "MakerFeeOrder", "OneTimeOrder", "MarketMakerOffset"
+        "MakerFeeOrder", "OneTimeOrder", "MarketMakerOffset", "PositionReopener"
     ];
     // do we also need individual recommended strategies per exchange?
     public wizardCandleSizes: number[] = [
@@ -654,6 +677,8 @@ export function isEmptyApiKeys(exchangeKeys: any) {
     for (let name in exchangeKeys)
     {
         const keys: any[] = exchangeKeys[name];
+        if (Array.isArray(keys) === false)
+            continue; // shouldn't happen
         for (let i = 0; i < keys.length; i++) {
             for (let prop in keys[i]) {
                 if (typeof keys[i][prop] === "string" && keys[i][prop].trim().length !== 0)

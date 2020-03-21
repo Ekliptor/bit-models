@@ -816,6 +816,9 @@ export enum Exchange {
     BXCO = 100,
     LIQUID = 101,
     YOBIT = 102,
+    COSS = 103,
+    BYBIT = 104,
+    BITKUB = 105,
 
     // other
     PEATIO = 200,
@@ -854,6 +857,9 @@ export const ExchangeName = new Map<string, Exchange>([
     ["BxCo", Exchange.BXCO],
     ["Liquid", Exchange.LIQUID],
     ["YoBit", Exchange.YOBIT],
+    ["Coss", Exchange.COSS],
+    ["Bybit", Exchange.BYBIT],
+    ["Bitkub", Exchange.BITKUB],
     ["Peatio", Exchange.PEATIO],
     ["LoggerEx", Exchange.LOGGER],
 ]);
@@ -882,6 +888,9 @@ export const ExchangeLink = new Map<string, string>([
     ["BxCo", "https://bx.in.th"],
     ["Liquid", "https://www.liquid.com"],
     ["YoBit", "https://yobit.net"],
+    ["Coss", "https://www.coss.io"],
+    ["Bybit", "https://www.bybit.com/en?affiliate_id=5901&group_id=1628&group_type=1"],
+    ["Bitkub", "https://www.bitkub.com/signup?ref=32816"],
     //["Peatio", "https://demo.openware.com/"], // don't show it in UI (yet)
     //["LoggerEx", ""], // only for devs
 ]);
@@ -909,6 +918,9 @@ export const ExchangeRecommendedPairs = new Map<string, string[]>([
     ["BxCo", ["THB_BTC", "THB_ETH", "THB_BCH", "THB_OMG", "BTC_ETH", "BTC_BCH"]],
     ["Liquid", ["JPY_BTC", "JPY_ETH", "JPY_BCH", "JPY_XRP", "BTC_ETH", "BTC_BCH"]],
     ["YoBit", ["USD_BTC", "USD_ETH", "BTC_ETH", "BTC_BCH", "BTC_DASH", "BTC_ZEC"]],
+    ["Coss", ["USD_BTC", "USD_ETH", "USDT_BTC", "USDT_ETH", "USDT_COS", "BTC_ETH", "BTC_BCH", "BTC_DASH"]],
+    ["Bybit", ["USD_BTC", "USD_ETH", "USD_EOS", "USD_XRP"]],
+    ["Bitkub", ["THB_BTC", "THB_ETH", "THB_BCH", "THB_LTC"]],
     ["Peatio", ["USD_ETH"]],
 ]);
 

@@ -15,6 +15,7 @@ export class TradeHistory extends DatabaseObject {
     public exchange: Exchange;
     public start: Date;
     public end: Date;
+    public endToleranceMin: number = 0; // how many minutes can be missing at the end (for warmup using backtest data)
 
     constructor(currencyPair: CurrencyPair, exchange: Exchange, start: Date, end: Date) {
         super();
@@ -55,28 +56,26 @@ export function addToHistory(db, history: TradeHistory, cb?) {
             if (!utils.date.overlaps(insertHistory, curHistory, true))
                 return;
             // merge the range by taking the min and max
-            let remove = false;
             if (insertHistory.start.getTime() >= curHistory.start.getTime()) {
                 insertHistory.start = curHistory.start;
-                remove = true;
             }
             if (insertHistory.end.getTime() <= curHistory.end.getTime()) {
                 insertHistory.end = curHistory.end;
-                remove = true;
             }
-            if (remove === true) // should always be true if history overlaps
-                deleteIds.push(curHistory._id);
+            deleteIds.push(curHistory._id);
         })
 
-        collection.deleteMany({_id: {$in: deleteIds}}, (err, result) => {
+        collection.insertOne(insertHistory, (err, result) => { // do insert before delete to be fail-safe
             if (err) {
-                logger.error("Error deleting overlapping ids", err);
-                return cb && cb(err);
+                logger.error("Error inserting trade history", err);
+                return cb && cb(err)
             }
-            collection.insertOne(insertHistory, (err, result) => {
+            if (deleteIds.length === 0)
+                return cb && cb()
+            collection.deleteMany({_id: {$in: deleteIds}}, (err, result) => {
                 if (err) {
-                    logger.error("Error inserting trade history", err);
-                    return cb && cb(err)
+                    logger.error("Error deleting overlapping ids", err);
+                    return cb && cb(err);
                 }
                 cb && cb()
             })
@@ -88,11 +87,13 @@ export function isAvailable(db, history: TradeHistory) {
     return new Promise<boolean>((resolve, reject) => {
         let collection = db.collection(COLLECTION_NAME)
         let pairNr = history.currencyPair.toNr();
+        // it's safe to reduce end, since overlapping ranges get merged there can only be 1 range (the longest)
+        let end = utils.date.dateAdd(history.end, "minute", -1*history.endToleranceMin);
         collection.findOne({ // should only be 1 since overlapping ranges are merged
             exchange: history.exchange,
             currencyPair: pairNr,
             start: {$lte: history.start},
-            end: {$gte: history.end}
+            end: {$gte: end}
         }).then((existingHistory) => {
             if (existingHistory)
                 resolve(true)
