@@ -94,7 +94,7 @@ export class ServerConfig extends DatabaseObject {
     public storeLendingTrades = false;
     public restartPausedBotsMin = 605; // 0 = disabled - restart bots if paused to reduce memory usage on small vServer
     public saveStateMin = 60; // save the bot state for faster restarts after crashes. 0 = disabled
-    public minStrategyUpdateMs = 1000;
+    public minStrategyUpdateMs = 500;
     public tradeNotifierClass = "TradeNotifier";
     public clearLogOnceProbability = 15;
     public maxClosePartialPercentage = 99.1;
@@ -163,8 +163,8 @@ export class ServerConfig extends DatabaseObject {
     public delayPossible2ndPositionCloseSec = 20 // don't set this too high, our strategy might change from long to short
     public waitOrdersRepeatingCheckSec = 30
     public delayVerificationOrderSec = 180 // verify internally in the exchange class if an order got executed with the correct amount
-    public orderMakerAdjustSec = 40
-    public orderContractExchangeAdjustSec = 240 // higher volatility, usually only 1 fee for submitting (maker + taker) order
+    public orderMakerAdjustSec = 30
+    public orderContractExchangeAdjustSec = 120 // higher volatility, usually only 1 fee for submitting (maker + taker) order
     public tickerExpirySec = 60
     public closeRatePercentOffset = 0.3; // how much higher/lower the max close rate shall be (for exchanges that don't support market orders)
     public maxSellPriseRise = 2.5 // how many times more coins the trader is allow to sell than buy (than specified in config)
@@ -182,14 +182,17 @@ export class ServerConfig extends DatabaseObject {
     public lastWorkingConfigName = "Noop";
     public lastWorkingConfigTime: Date = null;
     public fallbackTradingConfig = "Noop";
-    public lastWorkingResetConfigMin = 30;
+    public lastWorkingResetConfigMin = 60;
+    public saveLastWorkingConfigMin = 15; // how often to save the last working config repeatedly
     public lastRestartTime: Date = null;
     public restartPreviouslyIntervalMin = 10; // how many minutes we shall count the restart as recent, before resetting all config on failure otherwise
     public exchangesIdle = false;
     public maxProcessRuntimeMin = 20;
+    public waitCandlesInSyncMs = 5; // wait for candles to be in sync with trades (needed during backtesting)
     public copyOnlyFirstConfig = true; // only copy the 1st exchange + strategy group when creating a new config via copying existing one (easier to start using)
     public filterExchanges: string[] = ["BitMEX"]; // disable exchanges on startup after lastWorkingResetConfigMin if their connection is currently unstable
     public replaceExchange: string = "Bitfinex"; // replace the exchanges from filterExchanges with an exchange with a more reliable connection
+    public reloadConfigFileSec: number = 30; // reload config from disk in case it was changed with an external tool
 
     public socketTimeoutMs = 10000                    // for spider and other browsers
     public userAgents = [
@@ -331,6 +334,16 @@ export class ServerConfig extends DatabaseObject {
                 secret: "",
                 marginNotification: 0.5
             }],
+            BinanceFutures: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
+            }],
+            KrakenFutures: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
+            }],
             BxCo: [{
                 key: "",
                 secret: "",
@@ -450,7 +463,7 @@ export class ServerConfig extends DatabaseObject {
     public checkTelegramRunningMin = 120;
 
     public liveTradeCountBulkInsertStep = 5000;
-    public liveTradeImportRestartGraceTimeH = 2; // how long a restart/update can take at most and we still consider the trade history to be "complete"
+    public liveTradeImportRestartGraceTimeH = 4; // how long a restart/update can take at most and we still consider the trade history to be "complete"
     public storeTickerIntervalMin = 60;
     public liveLiquidationCountBulkInsertStep = 5;
 
