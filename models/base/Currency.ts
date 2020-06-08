@@ -884,7 +884,7 @@ export const ExchangeLink = new Map<string, string>([
     ["Gemini", "https://gemini.com"],
     ["HitBTC", "https://hitbtc.com"],
     ["Huobi", "https://huobi.com"],
-    ["KuCoin", "https://www.kucoin.com"],
+    ["KuCoin", "https://www.kucoin.com/ucenter/signup?rcode=2PPPf8y"],
     ["Nova", "https://novaexchange.com"],
     ["BitForex", "https://www.bitforex.com"],
     ["FCoin", "https://www.fcoin.com"],

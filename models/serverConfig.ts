@@ -20,7 +20,8 @@ const DEFAULT_EXCHANGE_PROXY = []; // an array of proxy URLs to randomly choose 
 export const COLLECTION_NAME = 'serverConfig'
 // config values that can be changed by the user (and are not overwritten with default values) must be added here
 export const OVERWRITE_PROPS = ["name", "notificationMethod", "apiKey", "twitterApi", "user", "username", "password", "userToken",
-    "loggedIn", "lastUsername", "userConfigs", "pausedTrading", "pausedOpeningPositions", "lastWorkingConfigName", "lastWorkingConfigTime", "firstStart", "configReset"];
+    "loggedIn", "lastUsername", "userConfigs", "pausedTrading", "pausedOpeningPositions",
+    "lastWorkingConfigName", "lastWorkingConfigTime", "firstStart", "configReset", "lastExchangeEdit"];
 
 let saveConfigTimerID: NodeJS.Timer = null;
 let saveConfigQueue = Promise.resolve();
@@ -55,7 +56,7 @@ export class ServerConfig extends DatabaseObject {
     public checkInstances = true
     public instanceCount = 6
     public monitoringInstanceDir = "_monitor";
-    public instanceApiCheckRepeatingSec = 30 // check again after x seconds befor terminating the instance
+    public instanceApiCheckRepeatingSec = 10 // check again after x seconds before terminating the instance
     public assumeBotCrashedMin = 11 // after we get no response for this time we assume the bot is not starting (errors on startup)
     public notifyInstanceLowRuntimeH = 24 // notify that a bot has likely problems due to low runtime if it hasn't been running instanceRuntimeOkH for notifyInstanceLowRuntimeH
     public instanceRuntimeOkH = 2
@@ -166,7 +167,7 @@ export class ServerConfig extends DatabaseObject {
     public orderMakerAdjustSec = 30
     public orderContractExchangeAdjustSec = 120 // higher volatility, usually only 1 fee for submitting (maker + taker) order
     public tickerExpirySec = 60
-    public closeRatePercentOffset = 0.3; // how much higher/lower the max close rate shall be (for exchanges that don't support market orders)
+    public closeRatePercentOffset = 0.6; // 0.3 // how much higher/lower the max close rate shall be (for exchanges that don't support market orders)
     public maxSellPriseRise = 2.5 // how many times more coins the trader is allow to sell than buy (than specified in config)
     public removeOldLog = false // remove old logfiles on app start
     public logTimeoutMin = 30 // after what time log entries from logOnce() can appear again
@@ -184,6 +185,7 @@ export class ServerConfig extends DatabaseObject {
     public fallbackTradingConfig = "Noop";
     public lastWorkingResetConfigMin = 60;
     public saveLastWorkingConfigMin = 15; // how often to save the last working config repeatedly
+    public lastExchangeEdit = "";
     public lastRestartTime: Date = null;
     public restartPreviouslyIntervalMin = 10; // how many minutes we shall count the restart as recent, before resetting all config on failure otherwise
     public exchangesIdle = false;
