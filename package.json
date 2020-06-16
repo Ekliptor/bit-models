@@ -1,6 +1,6 @@
 {
   "name": "@ekliptor/bit-models",
-  "version": "1.0.82",
+  "version": "1.0.83",
   "description": "All database models shared by apps of the BitBrain project.",
   "main": "build/models",
   "typings": "build/models.d.ts",
