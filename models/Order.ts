@@ -30,7 +30,14 @@ export class Order extends AssetAction {
         order.currencyPair = currencyPair;
         order.exchange = exchange;
         order.amount = amount;
+
+        // see getRate():
+        // -1: limit order at the last price
+        // -2: market order (if supported by exchange), otherwise identical to -1
         order.rate = rate; // rate can be 0 if we close a margin position
+        if (order.rate < -2 || /*order.rate === Number.MAX_VALUE*/ order.rate > 5000000000000)
+            throw new Error("Order has invalid rate: " + order.rate);
+
         order.type = type;
         order.marginOrder = marginOrder;
         order.date = new Date(); // orders are submitted in live mode

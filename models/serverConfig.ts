@@ -21,7 +21,8 @@ export const COLLECTION_NAME = 'serverConfig'
 // config values that can be changed by the user (and are not overwritten with default values) must be added here
 export const OVERWRITE_PROPS = ["name", "notificationMethod", "apiKey", "twitterApi", "user", "username", "password", "userToken",
     "loggedIn", "lastUsername", "userConfigs", "pausedTrading", "pausedOpeningPositions",
-    "lastWorkingConfigName", "lastWorkingConfigTime", "firstStart", "configReset", "lastExchangeEdit"];
+    "lastWorkingConfigName", "lastWorkingConfigTime", "firstStart", "configReset", "lastExchangeEdit",
+    "socialCrawlBlacklist"];
 
 let saveConfigTimerID: NodeJS.Timer = null;
 let saveConfigQueue = Promise.resolve();
@@ -54,7 +55,7 @@ export class ServerConfig extends DatabaseObject {
     public tradeNotificationPauseMin = 1; // lower value for executed trade notifications
     public checkMargins = true
     public checkInstances = true
-    public instanceCount = 6
+    public instanceCount = 3
     public monitoringInstanceDir = "_monitor";
     public instanceApiCheckRepeatingSec = 10 // check again after x seconds before terminating the instance
     public assumeBotCrashedMin = 11 // after we get no response for this time we assume the bot is not starting (errors on startup)
@@ -376,6 +377,11 @@ export class ServerConfig extends DatabaseObject {
                 secret: "",
                 marginNotification: 0.5
             }],
+            TheRockTrading: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
+            }],
             Peatio: [{
                 key: "",
                 secret: "",
@@ -501,6 +507,7 @@ export class ServerConfig extends DatabaseObject {
     public twitterRequireCurrencyKeyword = ["waves", "burst", "bat", "vet", "san", "ada", "mana", "ark", "mona", "naut",
         "avt", "veri", "link", "amp", "sub", "pay", "block", "game", "fun", "part", "via", "ppt", "theta", "icn",
         "ela", "maker", "status", "wings"];
+    public socialCrawlBlacklist: string[] = [];
 
     public cryptoCurrencyKeywords = [
         // additional crypto keywords. we already search for all currency keywords and symbols. see Currency.ts
@@ -610,11 +617,15 @@ export function loadServerConfig(db, cb) {
     // easier solution: always use config from here and merge with local file. every user has his own bot
     let currentConfig = nconf.get('serverConfig');
     let configObj = init({}) // create a default obj
-    OVERWRITE_PROPS.forEach((prop) => {
-        //delete configObj[prop];
-        if (currentConfig[prop] !== undefined)
-            configObj[prop] = currentConfig[prop];
-    });
+    if (currentConfig) {
+        OVERWRITE_PROPS.forEach((prop) => {
+            //delete configObj[prop];
+            if (currentConfig[prop] !== undefined)
+                configObj[prop] = currentConfig[prop];
+        });
+    }
+    else
+        logger.error("Error loading previous config. Please try deleting your config.json and ensure your config.ts (and .js) is valid.")
     nconf.set('serverConfig', configObj);
     setTimeout(() => {
         cb && cb()
