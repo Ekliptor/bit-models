@@ -813,6 +813,7 @@ export enum Exchange {
     BIBOX = 21,
     BINANCE_FUTURES = 22,
     KRAKEN_FUTURES = 23,
+    BINANCEUS = 24,
 
     // CCX lib minor exchanges
     BXCO = 100,
@@ -859,6 +860,7 @@ export const ExchangeName = new Map<string, Exchange>([
     ["Bibox", Exchange.BIBOX],
     ["BinanceFutures", Exchange.BINANCE_FUTURES],
     ["KrakenFutures", Exchange.KRAKEN_FUTURES],
+    ["BinanceUS", Exchange.BINANCEUS],
     ["BxCo", Exchange.BXCO],
     ["Liquid", Exchange.LIQUID],
     ["YoBit", Exchange.YOBIT],
@@ -893,6 +895,7 @@ export const ExchangeLink = new Map<string, string>([
     ["Bibox", "https://www.bibox.com"],
     ["BinanceFutures", "https://www.binance.com/?ref=11886203"],
     ["KrakenFutures", "https://futures.kraken.com/"],
+    ["BinanceUS", "https://www.binance.us/en"],
     ["BxCo", "https://bx.in.th"],
     ["Liquid", "https://www.liquid.com"],
     ["YoBit", "https://yobit.net"],
@@ -926,6 +929,7 @@ export const ExchangeRecommendedPairs = new Map<string, string[]>([
     ["Bibox", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "USDT_EOS", "BTC_ETH", "BTC_BCH"]],
     ["BinanceFutures", ["USD_BTC", "USD_ETH"]],
     ["KrakenFutures", ["USD_BTC", "USD_ETH"]],
+    ["BinanceUS", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "BTC_ETH", "BTC_LTC", "BTC_ETC", "BTC_BCH", "BTC_IOTA", "BTC_STEEM"]],
     ["BxCo", ["THB_BTC", "THB_ETH", "THB_BCH", "THB_OMG", "BTC_ETH", "BTC_BCH"]],
     ["Liquid", ["JPY_BTC", "JPY_ETH", "JPY_BCH", "JPY_XRP", "BTC_ETH", "BTC_BCH"]],
     ["YoBit", ["USD_BTC", "USD_ETH", "BTC_ETH", "BTC_BCH", "BTC_DASH", "BTC_ZEC"]],
