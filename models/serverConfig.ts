@@ -159,14 +159,14 @@ export class ServerConfig extends DatabaseObject {
     public canTradeImmediatelyAfterClose = true // we can place new buy/sell orders after closing a position without waiting for "holdMin"
     public orderTimeoutSec = 600 // cancel orders that haven't been filled after this time
     public checkOrdersFilledArbitrageSec = 10 // check if an order has been filled by querying all open orders during arbitrage mode
-    public orderAdjustBeforeTimeoutFactor = 3.0 // move orders at orderTimeoutSec/orderAdjustBeforeTimeoutFactor (before they time out)
+    public orderAdjustBeforeTimeoutFactor = 6.0 // 3.0 // move orders at orderTimeoutSec/orderAdjustBeforeTimeoutFactor (before they time out)
     public orderBookTimeoutSec = 90 // force reloading the orderbook snapshot if no updates happen for x seconds
     public maxRealtimeMarketOffsetSec = 120
     public delayPossible2ndPositionCloseSec = 20 // don't set this too high, our strategy might change from long to short
     public waitOrdersRepeatingCheckSec = 30
     public delayVerificationOrderSec = 180 // verify internally in the exchange class if an order got executed with the correct amount
-    public orderMakerAdjustSec = 30
-    public orderContractExchangeAdjustSec = 120 // higher volatility, usually only 1 fee for submitting (maker + taker) order
+    public orderMakerAdjustSec = 20
+    public orderContractExchangeAdjustSec = 60 // higher volatility, usually only 1 fee for submitting (maker + taker) order
     public tickerExpirySec = 60
     public closeRatePercentOffset = 0.6; // 0.3 // how much higher/lower the max close rate shall be (for exchanges that don't support market orders)
     public maxSellPriseRise = 2.5 // how many times more coins the trader is allow to sell than buy (than specified in config)
@@ -180,6 +180,7 @@ export class ServerConfig extends DatabaseObject {
     public searchAllPairsForState = true
     public pausedTrading = false
     public pausedOpeningPositions = false
+    public notifyApiErrors = false; // send exchange API errors to notication method
     public singleExchangeMode = true; // update exchange name in config if only 1 API key is set by user
     public lastWorkingConfigName = "Noop";
     public lastWorkingConfigTime: Date = null;
@@ -257,6 +258,11 @@ export class ServerConfig extends DatabaseObject {
                 marginNotification: 0.5
             }],
             Binance: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
+            }],
+            BinanceUS: [{
                 key: "",
                 secret: "",
                 marginNotification: 0.5

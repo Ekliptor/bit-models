@@ -813,6 +813,7 @@ export enum Exchange {
     BIBOX = 21,
     BINANCE_FUTURES = 22,
     KRAKEN_FUTURES = 23,
+    BINANCE_US = 24,
 
     // CCX lib minor exchanges
     BXCO = 100,
@@ -843,6 +844,7 @@ export const ExchangeName = new Map<string, Exchange>([
     ["Bitfinex", Exchange.BITFINEX],
     ["Bittrex", Exchange.BITTREX],
     ["Binance", Exchange.BINANCE],
+    ["BinanceUS", Exchange.BINANCE_US],
     ["BitMEX", Exchange.BITMEX],
     ["Deribit", Exchange.DERIBIT],
     ["CoinbasePro", Exchange.COINBASEPRO],
@@ -877,6 +879,7 @@ export const ExchangeLink = new Map<string, string>([
     ["Bitfinex", "https://bitfinex.com/?refcode=o58eGlJa"],
     ["Bittrex", "https://bittrex.com"],
     ["Binance", "https://www.binance.com/?ref=11886203"],
+    ["BinanceUS", "https://www.binance.us/"],
     ["BitMEX", "https://www.bitmex.com/register/NPaVXP"],
     ["Deribit", "https://www.deribit.com/reg-4328.975"],
     ["CoinbasePro", "https://pro.coinbase.com"],
@@ -902,6 +905,9 @@ export const ExchangeLink = new Map<string, string>([
     ["TheRockTrading", "https://www.therocktrading.com/"],
     //["Peatio", "https://demo.openware.com/"], // don't show it in UI (yet)
     //["LoggerEx", ""], // only for devs
+
+    // https://www.kucoin.com/ucenter/signup?rcode=2PPPf8y
+    // https://futures.kucoin.com/signup?rcode=2PPPf8y
 ]);
 
 export const ExchangeRecommendedPairs = new Map<string, string[]>([
@@ -911,6 +917,7 @@ export const ExchangeRecommendedPairs = new Map<string, string[]>([
     ["Bitfinex", ["USD_BTC", "USD_ETH", "USD_XRP", "USD_EOS", "USD_BCH", "USD_LTC", "USD_IOTA", "USD_NEO", "BTC_ETH", "BTC_XRP", "BTC_BCH"]],
     ["Bittrex", ["BTC_ETH","BTC_LTC", "BTC_BCH", "BTC_XRP", "BTC_XMR", "BTC_SC", "BTC_DASH", "BTC_TRX", "USD_BTC", "USD_ETH"]],
     ["Binance", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "BTC_ETH", "BTC_LTC", "BTC_ETC", "BTC_BCH", "BTC_IOTA", "BTC_STEEM"]],
+    ["BinanceUS", ["USDT_BTC", "USDT_ETH", "USDT_BCH", "BTC_ETH", "BTC_LTC", "BTC_ETC", "BTC_BCH", "BTC_IOTA", "BTC_STEEM"]],
     ["BitMEX", ["USD_BTC", "USD_ETH"]],
     ["Deribit", ["USD_BTC", "USD_ETH"]],
     ["CoinbasePro", ["USD_BTC", "USD_ETH", "USD_BCH", "USD_LTC", "USD_ETC", "BTC_ETH", "BTC_BCH"]],
