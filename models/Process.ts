@@ -71,7 +71,7 @@ export function setLastActive(db, process: Process = null, cb?) {
         process.lastContact = new Date();
 
         // update the process in DB
-        collection.updateOne({uniqueID: process.uniqueID}, process, {upsert: true}, (err, result) => {
+        collection.updateOne({uniqueID: process.uniqueID}, {$set: process}, {upsert: true}, (err, result) => {
             if (err)
                 //return cb && cb(err);
                 logger.error("Error updating process data", err);

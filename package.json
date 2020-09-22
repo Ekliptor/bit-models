@@ -12,13 +12,11 @@
   "repository": "https://github.com/Ekliptor/bit-models.git",
   "dependencies": {
     "@ekliptor/apputils": "^0.1.5",
-    "elasticsearch": "^12.1.0",
-    "mongodb": "^2.2.10"
+    "mongodb": "^3.6.0"
   },
   "devDependencies": {
-    "@types/elasticsearch": "^5.0.12",
     "@types/es6-shim": "^0.31.32",
-    "@types/mongodb": "^2.1.39",
+    "@types/mongodb": "^3.5.26",
     "@types/node": "^10.3.4"
   }
 }

@@ -82,7 +82,7 @@ export class SystemMessageData {
         let query = this._getIdQuery(_id)
         let excludeFields = _id ? {} : EXCLUDE_FIELDS
         let collection = connection.collection(COLLECTION_NAME)
-        collection.find(query, excludeFields).sort({created: -1}).limit(MAX_RESULTS).toArray((err, docs) => {
+        collection.find(query, {projection: excludeFields}).sort({created: -1}).limit(MAX_RESULTS).toArray((err, docs) => {
             if (err)
                 return callback && callback(null)
             if (_id) // return one doc

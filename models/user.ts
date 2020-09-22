@@ -158,7 +158,7 @@ export function register(db, account, appSalt: string, callback: UserCallback) {
     account.email = account.email ? account.email.trim() : '';
     // check if username exists, to show an error immediately (and not after failed insert)
     let collection = db.collection(COLLECTION_NAME);
-    collection.findOne({$or: [{username: account.username}, {email: account.email}]}, {fields: EXCLUDE_FIELDS}).then((doc) => {
+    collection.findOne({$or: [{username: account.username}, {email: account.email}]}, {projection: EXCLUDE_FIELDS}).then((doc) => {
         if (doc)
             return callback(doc.email === account.email ? ERROR.EMAIL_ALREADY_EXISTS : ERROR.USERNAME_ALREADY_EXISTS);
         // password strength: https://www.thepolyglotdeveloper.com/2015/05/use-regex-to-test-password-strength-in-javascript/
@@ -227,7 +227,7 @@ export function find(db, usernameOrEmail: string, isLogin, callback: UserCallbac
     }
     usernameOrEmail = usernameOrEmail.trim();
     let collection = db.collection(COLLECTION_NAME);
-    collection.find({$or: [{username: usernameOrEmail}, {email: usernameOrEmail}]}, EXCLUDE_FIELDS).toArray().then((docs) => {
+    collection.find({$or: [{username: usernameOrEmail}, {email: usernameOrEmail}]}, {projection: EXCLUDE_FIELDS}).toArray().then((docs) => {
         let emailLower = usernameOrEmail.toLocaleLowerCase();
         for (let doc of docs) {
             if (doc.username === usernameOrEmail || doc.email.toLocaleLowerCase() === emailLower)
@@ -239,7 +239,7 @@ export function find(db, usernameOrEmail: string, isLogin, callback: UserCallbac
 
 export function findByToken(db, token: string, callback: UserCallback) {
     let collection = db.collection(COLLECTION_NAME);
-    collection.findOne({token: token}, {fields: EXCLUDE_FIELDS}).then((doc) => {
+    collection.findOne({token: token}, {projection: EXCLUDE_FIELDS}).then((doc) => {
         if (doc)
             return callback(null, init(doc));
         return callback(ERROR.USESR_NOT_FOUND);
@@ -296,7 +296,7 @@ export function logAction(db, usernameOrEmail: string, actionName: string, req, 
     }
     usernameOrEmail = usernameOrEmail.trim();
     let collection = db.collection(COLLECTION_NAME);
-    collection.find({$or: [{username: usernameOrEmail}, {email: usernameOrEmail}]}, EXCLUDE_FIELDS).toArray().then((docs) => {
+    collection.find({$or: [{username: usernameOrEmail}, {email: usernameOrEmail}]}, {projection: EXCLUDE_FIELDS}).toArray().then((docs) => {
         let emailLower = usernameOrEmail.toLocaleLowerCase();
         for (let doc of docs) {
             if (doc.username === usernameOrEmail || doc.email.toLocaleLowerCase() === emailLower) {
@@ -325,7 +325,7 @@ export function setUserActive(db, userObjOrToken, cb?) {
         return userObj.lastActive && userObj.lastActive.getTime() + userAppData.userUpdateSec*1000 > Date.now()
     }
     if (objType !== 'object')
-        getUserObj = collection.findOne({token: userObjOrToken}, {fields: EXCLUDE_FIELDS})
+        getUserObj = collection.findOne({token: userObjOrToken}, {projection: EXCLUDE_FIELDS})
     else if (skipUpdate(userObjOrToken))
         return cb && cb()
     getUserObj.then((userObj) => {
