@@ -99,7 +99,7 @@ export class SystemMessageData {
             return;
         }
         let collection = connection.collection(COLLECTION_NAME)
-        collection.count({seen: null}).then((count) => {
+        collection.countDocuments({seen: null}).then((count) => {
             lastSeenCache.update(count);
             callback && callback(count)
         })

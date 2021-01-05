@@ -823,6 +823,7 @@ export enum Exchange {
     BYBIT = 104,
     BITKUB = 105,
     THEROCKTRADING = 106,
+    FTX = 107,
 
     // other
     PEATIO = 200,
@@ -868,6 +869,7 @@ export const ExchangeName = new Map<string, Exchange>([
     ["Bybit", Exchange.BYBIT],
     ["Bitkub", Exchange.BITKUB],
     ["TheRockTrading", Exchange.THEROCKTRADING],
+    ["FTX", Exchange.FTX],
     ["Peatio", Exchange.PEATIO],
     ["LoggerEx", Exchange.LOGGER],
 ]);
@@ -903,6 +905,7 @@ export const ExchangeLink = new Map<string, string>([
     ["Bybit", "https://www.bybit.com/en?affiliate_id=5901&group_id=1628&group_type=1"],
     ["Bitkub", "https://www.bitkub.com/signup?ref=32816"],
     ["TheRockTrading", "https://www.therocktrading.com/"],
+    ["FTX", "https://ftx.com/#a=2702597"],
     //["Peatio", "https://demo.openware.com/"], // don't show it in UI (yet)
     //["LoggerEx", ""], // only for devs
 
@@ -940,6 +943,7 @@ export const ExchangeRecommendedPairs = new Map<string, string[]>([
     ["Bybit", ["USD_BTC", "USD_ETH", "USD_EOS", "USD_XRP"]],
     ["Bitkub", ["THB_BTC", "THB_ETH", "THB_BCH", "THB_LTC"]],
     ["TheRockTrading", ["EUR_BTC", "EUR_ETH", "EUR_LTC", "EUR_XRP", "BTC_ETH", "BTC_LTC", "BTC_XRP"]],
+    ["FTX", ["USD_BTC", "USD_ETH", "USD_BCH", "USD_LTC"]],
     ["Peatio", ["USD_ETH"]],
 ]);
 

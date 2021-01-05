@@ -388,6 +388,11 @@ export class ServerConfig extends DatabaseObject {
                 secret: "",
                 marginNotification: 0.5
             }],
+            FTX: [{
+                key: "",
+                secret: "",
+                marginNotification: 0.5
+            }],
             Peatio: [{
                 key: "",
                 secret: "",
@@ -477,7 +482,7 @@ export class ServerConfig extends DatabaseObject {
     public checkTelegramRunningMin = 120;
 
     public liveTradeCountBulkInsertStep = 5000;
-    public liveTradeImportRestartGraceTimeH = 4; // how long a restart/update can take at most and we still consider the trade history to be "complete"
+    public liveTradeImportRestartGraceTimeH = 12; // how long a restart/update can take at most and we still consider the trade history to be "complete"
     public storeTickerIntervalMin = 60;
     public liveLiquidationCountBulkInsertStep = 5;
 

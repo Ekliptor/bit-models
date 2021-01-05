@@ -90,7 +90,7 @@ export function getActiveCount(db, proc: Process = null, returnError = false) {
         let maxAge = utils.date.dateAdd(new Date(), 'minute', -1*COUNT_ACTIVE_MIN)
         if (!proc)
             proc = getProcessObject();
-        collection.count({
+        collection.countDocuments({
             lastContact: {$gt: maxAge},
             uniqueID: {$ne: proc.uniqueID}                  // don't count this process (on restart)
         }, {readPreference: ReadPreference.SECONDARY_PREFERRED}).then((count) => {
