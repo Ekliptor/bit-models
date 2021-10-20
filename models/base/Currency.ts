@@ -339,16 +339,38 @@ export enum Currency {
     TRST = 470,
     MTC = 471,
     ATOM = 472,
+    SOL = 473,
+    POL = 474,
+    UNI = 475,
+    LUNA = 476,
+    WBTC = 477,
+    AVAX = 478,
+    SHIB = 479,
+    ALGO = 480,
+    MATIC = 481,
+    ICP = 482,
+    FIL = 483,
+    FTT = 484,
+    BTCB = 485,
+    FTM = 486,
+    HBAR = 487,
+    CAKE = 488,
+    SUSHI = 489,
+    XEC = 490,
+    AXS = 491,
 
-    USDT = 200, // US Dollar tethered, rates almost identical to US dollar
-    USDC = 201,
+    USDT = 2000, // US Dollar tethered, rates almost identical to US dollar
+    USDC = 2001,
+    USDH = 2002,
+    BUSD = 2003,
+    DAI = 2004,
 
     // Fiat
-    USD = 300,
-    EUR = 301,
-    JPY = 302,
-    GBP = 303,
-    THB = 304,
+    USD = 3000,
+    EUR = 3001,
+    JPY = 3002,
+    GBP = 3003,
+    THB = 3004,
 
     ALL = 10000
 
@@ -361,7 +383,9 @@ export function isCryptoCurrency(currency: Currency): boolean {
 
 export function isFiatCurrency(currency: Currency): boolean {
     return currency === Currency.USD || currency === Currency.EUR || currency === Currency.JPY || currency === Currency.GBP
-        || currency === Currency.USDT || currency === Currency.USDC;
+        || currency === Currency.THB
+        || currency === Currency.USDT || currency === Currency.USDC || currency === Currency.USDH || currency === Currency.BUSD
+        || currency === Currency.DAI;
 }
 
 // mapping of Currency. needed for parsing trollbox & social media
@@ -433,8 +457,6 @@ export const CurrencyName = new Map([
     [Currency.XBC, ["BitcoinPlus", "Bitcoin Plus"]],
     [Currency.XPM, ["Primecoin"]],
     [Currency.XVC, ["Vcash"]],
-    [Currency.USDT, ["US Dollar Tethered", "Tether"]],
-    [Currency.USDC, ["USDCoin"]],
     [Currency.BCH, ["Bitcoin Cash", "BitcoinCash", "BCC", "BCash"]], // BitConnect is dead, Bittrex calls it BCC
     [Currency.EOS, ["EOS"]],
     [Currency.IOTA, ["IOTA", "MIOTA"]],
@@ -699,9 +721,39 @@ export const CurrencyName = new Map([
     [Currency.TRST, ["WeTrust"]],
     [Currency.MTC, ["MTC Mesh Network"]],
     [Currency.ATOM, ["Cosmos"]],
+    [Currency.SOL, ["Solana"]],
+    [Currency.POL, ["Polkadot"]],
+    [Currency.UNI, ["Uniswap"]],
+    [Currency.LUNA, ["Terra"]],
+    [Currency.WBTC, ["Wrapped Bitcoin"]],
+    [Currency.AVAX, ["Avalanche"]],
+    [Currency.SHIB, ["Shiba", "SHIBA INU"]],
+    [Currency.ALGO, ["Algorand"]],
+    [Currency.MATIC, ["Polygon", "Matic"]],
+    [Currency.ICP, ["Internet Computer"]],
+    [Currency.FIL, ["Filecoin"]],
+    [Currency.FTT, ["FTX Token"]],
+    [Currency.BTCB, ["Bitcoin BEP2"]],
+    [Currency.FTM, ["Fantom"]],
+    [Currency.HBAR, ["Hedera"]],
+    [Currency.CAKE, ["Pancake"]],
+    [Currency.SUSHI, ["Sushi swap"]],
+    [Currency.XEC, ["eCash"]],
+    [Currency.AXS, ["Axie Infinity"]],
 
+    // stable
+    [Currency.USDT, ["US Dollar Tethered", "Tether"]],
+    [Currency.USDC, ["USDCoin"]],
+    [Currency.USDH, ["Honest USD"]],
+    [Currency.BUSD, ["Binance USD"]],
+    [Currency.DAI, ["DAI"]],
+
+    // fiat
     [Currency.USD, ["US Dollar"]],
-    [Currency.EUR, ["Euro"]]
+    [Currency.EUR, ["Euro"]],
+    [Currency.GBP, ["Pound sterling"]],
+    [Currency.JPY, ["Japanese Yen"]],
+    [Currency.THB, ["Thai Baht"]],
 ]);
 
 /**
@@ -860,7 +912,7 @@ export const ExchangeName = new Map<string, Exchange>([
     ["BitForex", Exchange.BITFOREX],
     ["FCoin", Exchange.FCOIN],
     ["Bibox", Exchange.BIBOX],
-    ["BinanceFutures", Exchange.BINANCE_FUTURES],
+    //["BinanceFutures", Exchange.BINANCE_FUTURES],
     ["KrakenFutures", Exchange.KRAKEN_FUTURES],
     ["BxCo", Exchange.BXCO],
     ["Liquid", Exchange.LIQUID],
